@@ -1,632 +1,1844 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="scroll-smooth">
+<html lang="zh-HK" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高雄慢活尋香與美食巡禮</title>
+    <title>Kaohsiung 2026 • 慢活尋香與美食巡禮</title>
+    <!-- Google Fonts: Jost (科技幾何) + Noto Sans HK (清晰中文) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Noto+Sans+HK:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons: 極簡幾何單色線條 -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        washi: '#FFFCF6',
-                        ink: '#3E3A39',
-                        coral: '#F2A497',
-                        yamabuki: '#F6D27A',
-                        water: '#A8D3E6',
-                        wakatake: '#B9DAA5',
-                        alert: '#FF9F43'
-                    },
-                    borderWidth: {
-                        '3': '3px'
-                    },
-                    borderRadius: {
-                        'xl': '1rem',
-                        '2xl': '1.5rem',
-                        '3xl': '2rem'
+                        cloud: '#F3F4F1',       /* 60% 主底色 Cloud Dancer */
+                        hematite: '#736B67',    /* 30% 核心排版文字 Hematite */
+                        cover: '#A39C9B',       /* 30% 次要資訊 Cloud Cover */
+                        fusion: '#4A6C8C',      /* 10% 視覺焦點 Blue Fusion */
+                        vista: 'rgba(205, 229, 206, 0.35)',   /* 標籤底色 Veiled Vista */
+                        mist: 'rgba(228, 212, 136, 0.35)'     /* 標籤底色 Golden Mist */
                     },
                     fontFamily: {
-                        'huninn': ['"jf-openhuninn"', 'sans-serif']
+                        sans: ['Jost', 'Noto Sans HK', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -15px rgba(115, 107, 103, 0.07), 0 4px 16px -4px rgba(115, 107, 103, 0.03)',
+                        'hover': '0 24px 50px -10px rgba(74, 108, 140, 0.12)'
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Import a cute rounded font (jf-openhuninn equivalent) */
-        @font-face {
-            font-family: 'jf-openhuninn';
-            src: url('https://cdn.jsdelivr.net/npm/jf-openhuninn@1.1.0/jf-openhuninn-1.1.woff2') format('woff2');
-            font-display: swap;
-        }
-
+        /* 全域重設與字型行距標準 */
         body {
-            background-color: theme('colors.washi');
-            color: theme('colors.ink');
-            font-family: theme('fontFamily.huninn');
-            -webkit-tap-highlight-color: transparent;
+            background-color: #F3F4F1;
+            color: #736B67;
+            font-family: 'Jost', 'Noto Sans HK', sans-serif;
+            letter-spacing: 0.035em;
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Picture Book Aesthetic Styles */
-        .border-thick {
-            border: 3px solid theme('colors.ink');
+        /* 零實線邊框：全面採用毛玻璃與微暖白層次 */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.76);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: none !important;
         }
 
-        .shadow-solid {
-            box-shadow: 4px 4px 0px theme('colors.ink');
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        /* 導覽列極致毛玻璃 */
+        .glass-nav {
+            background: rgba(243, 244, 241, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: none !important;
         }
 
-        .shadow-solid-sm {
-            box-shadow: 2px 2px 0px theme('colors.ink');
+        /* 隱藏滾動條但保持滾動 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 高雅順滑動畫：淡入 + 微向上滑動 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        button.shadow-solid:active, 
-        .clickable.shadow-solid:active {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px theme('colors.ink');
+        /* 支援 prefers-reduced-motion 無障礙設定 */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            .fade-up {
+                opacity: 1 !important;
+                transform: none !important;
+            }
         }
 
-        /* Timeline vertical line */
-        .timeline-line::before {
-            content: '';
-            position: absolute;
-            left: 19px; 
-            top: 24px;
-            bottom: -16px;
-            width: 3px;
-            background-color: theme('colors.ink');
-            z-index: 0;
-        }
-        .timeline-item:last-child .timeline-line::before {
-            display: none;
-        }
-
-        /* Map Links */
+        /* 地圖連結懸浮回饋 */
         .map-link {
-            color: theme('colors.coral');
-            text-decoration: underline;
-            text-decoration-thickness: 2px;
-            text-underline-offset: 2px;
-            font-weight: 900;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
+            color: #736B67;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.25s ease;
+            position: relative;
         }
         .map-link:hover {
-            background-color: theme('colors.coral');
-            color: theme('colors.washi');
-            text-decoration: none;
-            border-radius: 4px;
-            padding: 0 4px;
-            margin: 0 -4px;
+            color: #4A6C8C;
         }
 
-        /* Table Styles */
-        table {
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
+        /* Checklist 互動打勾樣式 */
+        .custom-checkbox input:checked + .checkbox-circle {
+            background-color: #4A6C8C;
         }
-        th, td {
-            border-bottom: 3px solid theme('colors.ink');
-            border-right: 3px solid theme('colors.ink');
-            padding: 0.75rem;
-            text-align: left;
+        .custom-checkbox input:checked + .checkbox-circle svg {
+            opacity: 1;
         }
-        th {
-            background-color: theme('colors.yamabuki');
-            font-weight: 900;
-        }
-        tr:first-child th:first-child { border-top-left-radius: 0.75rem; }
-        tr:first-child th:last-child { border-top-right-radius: 0.75rem; }
-        tr:last-child td:first-child { border-bottom-left-radius: 0.75rem; }
-        tr:last-child td:last-child { border-bottom-right-radius: 0.75rem; }
-        th:first-child, td:first-child { border-left: 3px solid theme('colors.ink'); }
-        tr:first-child th { border-top: 3px solid theme('colors.ink'); }
-        tr:last-child td { border-bottom: 3px solid theme('colors.ink'); }
-
-        /* Animations */
-        @media (prefers-reduced-motion: no-preference) {
-            .anim-float {
-                animation: float 3s ease-in-out infinite;
-            }
-            .anim-float-delayed {
-                animation: float 3.5s ease-in-out infinite 0.5s;
-            }
-            .anim-bounce-in {
-                animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-            }
+        .custom-checkbox input:checked ~ .check-text {
+            color: #A39C9B;
+            text-decoration: line-through;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-
-        @keyframes bounceIn {
-            0% { transform: scale(0.95); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .hide-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scroll {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        /* 裁剪視窗遮罩與控制元件樣式 */
+        .crop-overlay-grid {
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 33.33% 33.33%;
         }
     </style>
 </head>
-<body class="antialiased pb-24 selection:bg-yamabuki selection:text-ink">
+<body class="selection:bg-fusion/20 selection:text-fusion">
 
-    <!-- Fixed Header -->
-    <header class="fixed top-0 w-full bg-washi border-b-3 border-ink z-50 px-4 py-3 flex justify-between items-center shadow-solid-sm">
-        <div class="text-xl font-bold flex items-center gap-2">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="#3E3A39" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/>
-            </svg>
-            高雄 2026
+    <!-- 頂端導覽列：Sticky + iOS 級毛玻璃 + 手機端 Pull-down 選單 -->
+    <header class="sticky top-0 z-50 glass-nav transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-6 h-18 py-4 flex items-center justify-between">
+            <a href="#" class="text-base md:text-xl font-medium tracking-wider text-hematite flex items-center gap-2.5">
+                <i class="ph ph-airplane-tilt text-fusion text-2xl"></i>
+                <span>KAOHSIUNG <span class="font-light text-cover">2026</span></span>
+            </a>
+
+            <!-- 桌面端橫向導覽 -->
+            <nav class="hidden md:flex gap-9 text-base text-cover font-medium">
+                <a href="#overview" onclick="navigateSection(event, 'overview')" class="hover:text-fusion transition-colors">行程表</a>
+                <a href="#itinerary" onclick="navigateSection(event, 'itinerary')" class="hover:text-fusion transition-colors">每日細節</a>
+                <a href="#fragrance" onclick="navigateSection(event, 'fragrance')" class="hover:text-fusion transition-colors">尋香指南</a>
+                <a href="#wheel-section" onclick="navigateSection(event, 'wheel-section')" class="hover:text-fusion transition-colors">美食輪盤</a>
+                <a href="#checklist-section" onclick="navigateSection(event, 'checklist-section')" class="hover:text-fusion transition-colors">Checklist</a>
+            </nav>
+
+            <!-- 手機端下拉菜單按鈕 -->
+            <button id="mobile-menu-btn" class="md:hidden w-10 h-10 rounded-full bg-white/70 text-hematite flex items-center justify-center text-xl shadow-sm focus:outline-none" aria-label="Toggle Menu">
+                <i id="menu-icon" class="ph-bold ph-list"></i>
+            </button>
         </div>
-        <nav class="flex gap-2 text-sm font-bold overflow-x-auto hide-scroll pb-1">
-            <a href="#itinerary" class="bg-yamabuki px-3 py-1 rounded-full border-thick shadow-solid-sm whitespace-nowrap">行程</a>
-            <a href="#alerts" class="bg-alert px-3 py-1 rounded-full border-thick shadow-solid-sm text-washi whitespace-nowrap">提醒</a>
-            <a href="#scent" class="bg-water px-3 py-1 rounded-full border-thick shadow-solid-sm whitespace-nowrap">尋香</a>
-            <a href="#checklist" class="bg-coral px-3 py-1 rounded-full border-thick shadow-solid-sm text-washi whitespace-nowrap">清單</a>
-        </nav>
+
+        <!-- 手機端 Pull-down 毛玻璃選單 (預設隱藏) -->
+        <div id="mobile-dropdown" class="hidden md:hidden glass-nav px-6 pb-6 pt-2 shadow-soft space-y-4 transition-all duration-300">
+            <a href="#overview" onclick="navigateSection(event, 'overview')" class="block py-2 text-base font-medium text-hematite hover:text-fusion flex items-center gap-3">
+                <i class="ph ph-calendar-blank text-fusion"></i> 行程表
+            </a>
+            <a href="#itinerary" onclick="navigateSection(event, 'itinerary')" class="block py-2 text-base font-medium text-hematite hover:text-fusion flex items-center gap-3">
+                <i class="ph ph-map-pin text-fusion"></i> 每日細節
+            </a>
+            <a href="#fragrance" onclick="navigateSection(event, 'fragrance')" class="block py-2 text-base font-medium text-hematite hover:text-fusion flex items-center gap-3">
+                <i class="ph ph-drop text-fusion"></i> 尋香指南
+            </a>
+            <a href="#wheel-section" onclick="navigateSection(event, 'wheel-section')" class="block py-2 text-base font-medium text-hematite hover:text-fusion flex items-center gap-3">
+                <i class="ph ph-disc text-fusion"></i> 美食輪盤
+            </a>
+            <a href="#checklist-section" onclick="navigateSection(event, 'checklist-section')" class="block py-2 text-base font-medium text-hematite hover:text-fusion flex items-center gap-3">
+                <i class="ph ph-check-square-offset text-fusion"></i> Checklist
+            </a>
+        </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-md mx-auto pt-20 px-4 flex flex-col gap-6 overflow-hidden">
+    <!-- 首頁視覺 (Hero Section)：換用 Chiikawa 栗子饅頭 & 獅薩 歡樂開懷唱歌視覺 -->
+    <section class="relative min-h-[82vh] flex items-center justify-center px-4 py-16 overflow-hidden">
+        <!-- 滿版背景圖層：內建高解析度重現你上傳的 Chiikawa 唱歌畫面，並提供相片上傳自訂切換按鈕 -->
+        <div class="absolute inset-0 z-0 overflow-hidden flex items-center justify-center bg-[#E6ECF0]">
+            <!-- 柔和極簡天空背景：低飽和藍天與棉花糖般的輕透微暖白雲，完美契合 Cloud Dancer 風格與氣質 -->
+            <img id="hero-sky-bg" 
+                 src="https://images.unsplash.com/photo-1499346030926-9a72daac6c63?auto=format&fit=crop&w=2000&q=85" 
+                 alt="Minimal Soft Sky and Clouds" 
+                 class="w-full h-full object-cover object-center filter brightness-[1.02] contrast-[0.96] transition-opacity duration-500" />
 
-        <!-- Hero Section -->
-        <section class="relative bg-water rounded-3xl border-thick p-6 shadow-solid mt-4 overflow-hidden flex flex-col items-center text-center">
-            <svg class="absolute top-4 left-4 w-12 h-12 anim-float opacity-80" viewBox="0 0 100 100">
-                <path d="M20,50 Q40,30 60,50 T100,50" fill="none" stroke="#FFFCF6" stroke-width="6" stroke-linecap="round"/>
-                <circle cx="50" cy="30" r="15" fill="#F6D27A" stroke="#3E3A39" stroke-width="3"/>
-            </svg>
-            
-            <div class="relative z-10 w-full mb-4">
-                <svg class="w-40 h-40 mx-auto anim-float-delayed" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="20" y="160" width="160" height="20" rx="10" fill="#B9DAA5" stroke="#3E3A39" stroke-width="4"/>
-                    <rect x="70" y="90" width="20" height="70" fill="#F2A497" stroke="#3E3A39" stroke-width="4"/>
-                    <rect x="110" y="90" width="20" height="70" fill="#F2A497" stroke="#3E3A39" stroke-width="4"/>
-                    <rect x="70" y="70" width="60" height="20" fill="#F6D27A" stroke="#3E3A39" stroke-width="4"/>
-                    <rect x="85" y="30" width="30" height="40" fill="#A8D3E6" stroke="#3E3A39" stroke-width="4"/>
-                    <path d="M100 10 L100 30" stroke="#3E3A39" stroke-width="4" stroke-linecap="round"/>
-                    <rect x="30" y="140" width="40" height="20" rx="5" fill="#FFFCF6" stroke="#3E3A39" stroke-width="4"/>
-                    <circle cx="40" cy="160" r="4" fill="#3E3A39"/>
-                    <circle cx="60" cy="160" r="4" fill="#3E3A39"/>
-                    <rect x="35" y="145" width="10" height="8" rx="2" fill="#A8D3E6" stroke="#3E3A39" stroke-width="2"/>
-                    <rect x="50" y="145" width="10" height="8" rx="2" fill="#A8D3E6" stroke="#3E3A39" stroke-width="2"/>
-                </svg>
+            <!-- 用戶自訂實拍圖層 (支援隨時上傳本地圖片或裁切套用) -->
+            <img id="custom-hero-img" 
+                 src="" 
+                 alt="Custom User Hero" 
+                 class="hidden w-full h-full object-cover object-center filter brightness-[0.98] contrast-[0.95]" />
+
+            <!-- 極致高雅微暖白半透明漸層層：讓前景卡片懸浮並融入 Cloud Dancer 底色 -->
+            <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-white/10 to-cloud"></div>
+        </div>
+
+        <!-- 懸浮毛玻璃卡片（寬闊內距 36px-48px） -->
+        <div class="relative z-10 glass-panel rounded-[2.5rem] p-9 md:p-14 max-w-xl w-full text-center shadow-soft fade-up">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 text-xs font-semibold tracking-wider text-fusion mb-6">
+                <i class="ph-bold ph-sparkle"></i> 慢活尋香與美食巡禮
+            </div>
+            <h1 class="text-3xl md:text-5xl font-semibold text-hematite tracking-wider mb-4">
+                高雄 <span class="font-semibold">2026</span>
+            </h1>
+            <p class="text-sm md:text-base text-cover font-normal mb-8 tracking-wide">
+                29 Oct 2026 — 03 Nov 2026 • 6 天 5 夜自由漫遊
+            </p>
+
+            <!-- 出發倒數計時器 -->
+            <div id="countdown" class="grid grid-cols-4 gap-3 md:gap-4 max-w-sm mx-auto mb-9">
+                <div class="bg-white/70 rounded-2xl py-3 px-2">
+                    <span id="days" class="text-2xl font-bold text-hematite block">--</span>
+                    <span class="text-[10px] font-semibold text-cover uppercase">Days</span>
+                </div>
+                <div class="bg-white/70 rounded-2xl py-3 px-2">
+                    <span id="hours" class="text-2xl font-bold text-hematite block">--</span>
+                    <span class="text-[10px] font-semibold text-cover uppercase">Hours</span>
+                </div>
+                <div class="bg-white/70 rounded-2xl py-3 px-2">
+                    <span id="mins" class="text-2xl font-bold text-hematite block">--</span>
+                    <span class="text-[10px] font-semibold text-cover uppercase">Mins</span>
+                </div>
+                <div class="bg-white/70 rounded-2xl py-3 px-2">
+                    <span id="secs" class="text-2xl font-bold text-hematite block">--</span>
+                    <span class="text-[10px] font-semibold text-cover uppercase">Secs</span>
+                </div>
             </div>
 
-            <h1 class="text-2xl font-bold mb-2 leading-tight">慢活尋香與美食巡禮<br>高雄 6 天 5 夜</h1>
+            <div class="flex justify-center">
+                <a href="#itinerary" onclick="navigateSection(event, 'itinerary')" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-fusion text-white text-sm font-medium hover:bg-fusion/90 shadow-soft transition-all">
+                    瀏覽每日導航 <i class="ph-bold ph-arrow-down"></i>
+                </a>
+            </div>
+
+            <!-- 便捷換相小工具：可點擊隨時載入你本機的圖片 -->
+            <div class="mt-4">
+                <label class="cursor-pointer inline-flex items-center gap-1.5 text-[11px] text-cover hover:text-fusion transition-colors">
+                    <i class="ph ph-crop"></i>
+                    <span>更換 / 裁剪首頁照片</span>
+                    <input type="file" id="hero-file-input" accept="image/*" class="hidden" onchange="initCropModal(event)">
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <!-- 相片裁剪 Modal (Apple / Google 極簡毛玻璃風格) -->
+    <div id="crop-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-hematite/40 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="crop-modal-card" class="glass-panel bg-white/95 rounded-[2.5rem] p-6 md:p-8 max-w-xl w-full shadow-hover transform scale-95 transition-transform duration-300 flex flex-col space-y-5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-crop text-fusion text-xl"></i>
+                    <h3 class="font-bold text-hematite text-base md:text-lg">自訂與裁剪首頁照片</h3>
+                </div>
+                <button onclick="closeCropModal()" class="w-8 h-8 rounded-full bg-cloud flex items-center justify-center text-hematite hover:text-fusion transition-colors">
+                    <i class="ph ph-x font-bold"></i>
+                </button>
+            </div>
+
+            <!-- 裁切預覽可視區域 -->
+            <div class="relative w-full h-64 md:h-72 bg-hematite/90 rounded-2xl overflow-hidden flex items-center justify-center select-none cursor-grab active:cursor-grabbing" id="crop-container">
+                <img id="crop-preview-img" src="" alt="Crop Preview" class="max-w-none transition-transform duration-75 origin-center pointer-events-none">
+                <!-- 構圖輔助網格 -->
+                <div class="absolute inset-0 pointer-events-none crop-overlay-grid border border-white/20 rounded-2xl"></div>
+            </div>
+
+            <!-- 控制面板：縮放條與比例按鈕 -->
+            <div class="space-y-4 pt-1">
+                <!-- 縮放 Zoom 控制 -->
+                <div class="flex items-center gap-3">
+                    <i class="ph ph-magnifying-glass-minus text-cover text-sm"></i>
+                    <input type="range" id="crop-zoom" min="0.5" max="3" step="0.05" value="1" oninput="updateCropTransform()" class="w-full h-1.5 bg-cloud rounded-lg appearance-none cursor-pointer accent-[#4A6C8C]">
+                    <i class="ph ph-magnifying-glass-plus text-cover text-sm"></i>
+                </div>
+
+                <!-- 比例快捷選擇 (16:9 / 16:10 / 自由) -->
+                <div class="flex items-center justify-between text-xs text-cover">
+                    <span class="font-medium">建議比例：</span>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="setAspectRatio(16/9, this)" class="crop-ratio-btn px-3 py-1 rounded-full bg-fusion text-white font-medium shadow-sm transition-all">16:9 最佳</button>
+                        <button type="button" onclick="setAspectRatio(16/10, this)" class="crop-ratio-btn px-3 py-1 rounded-full bg-cloud text-hematite font-medium hover:bg-white transition-all">16:10 原圖</button>
+                        <button type="button" onclick="setAspectRatio(4/3, this)" class="crop-ratio-btn px-3 py-1 rounded-full bg-cloud text-hematite font-medium hover:bg-white transition-all">4:3</button>
+                    </div>
+                </div>
+                <p class="text-[11px] text-cover text-center leading-normal">
+                    💡 提示：可直接於畫面中拖曳移動位置，主角（如獅薩）靠左右兩側觀感更佳。
+                </p>
+            </div>
+
+            <!-- 操作按鈕 -->
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="closeCropModal()" class="py-3 rounded-full bg-cloud text-hematite text-sm font-medium hover:bg-white active:scale-95 transition-all">
+                    取消
+                </button>
+                <button onclick="applyCrop()" class="py-3 rounded-full bg-fusion text-white text-sm font-semibold shadow-soft hover:bg-fusion/90 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <i class="ph-bold ph-check"></i> 確認套用
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 核心資訊卡片：航班與住宿 -->
+    <section class="max-w-5xl mx-auto px-4 -mt-8 relative z-20">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Flight 1 -->
+            <div class="glass-panel rounded-3xl p-7 md:p-8 shadow-soft flex items-center gap-5">
+                <div class="w-12 h-12 rounded-2xl bg-fusion/10 flex items-center justify-center text-fusion flex-shrink-0 text-2xl">
+                    <i class="ph-bold ph-airplane-takeoff"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-cover font-semibold uppercase tracking-wider block">去程航班</span>
+                    <h3 class="text-lg font-bold text-hematite">長榮 BR846</h3>
+                    <p class="text-xs text-cover mt-1 font-medium">29/10 12:15 🇭🇰 ➡️ 13:45 🇹🇼</p>
+                </div>
+            </div>
+
+            <!-- Hotel -->
+            <div class="glass-panel rounded-3xl p-7 md:p-8 shadow-soft flex items-center gap-5">
+                <div class="w-12 h-12 rounded-2xl bg-fusion/10 flex items-center justify-center text-fusion flex-shrink-0 text-2xl">
+                    <i class="ph-bold ph-buildings"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <span class="text-xs text-cover font-semibold uppercase tracking-wider block">旅宿據點</span>
+                    <h3 class="text-base font-bold text-hematite truncate">康橋商旅 - 三多商圈館</h3>
+                    <a href="https://www.google.com/maps/search/?api=1&query=康橋商旅-三多商圈館" target="_blank" class="map-link text-xs text-cover mt-1 block truncate">
+                        林森二路10號 (三多商圈站 4號口)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Flight 2 -->
+            <div class="glass-panel rounded-3xl p-7 md:p-8 shadow-soft flex items-center gap-5">
+                <div class="w-12 h-12 rounded-2xl bg-fusion/10 flex items-center justify-center text-fusion flex-shrink-0 text-2xl">
+                    <i class="ph-bold ph-airplane-landing"></i>
+                </div>
+                <div>
+                    <span class="text-xs text-cover font-semibold uppercase tracking-wider block">回程航班</span>
+                    <h3 class="text-lg font-bold text-hematite">長榮 BR849</h3>
+                    <p class="text-xs text-cover mt-1 font-medium">03/11 16:40 🇹🇼 ➡️ 18:25 🇭🇰</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content (各大區塊間距寬闊 space-y-36 ~ space-y-40，精緻留白) -->
+    <main class="max-w-5xl mx-auto px-4 space-y-32 md:space-y-40 mt-28">
+
+        <!-- Master Schedule Overview (行程資訊總表：精練卡片設計，拒絕冗長) -->
+        <section id="overview" class="fade-up pt-4 scroll-mt-28">
+            <div class="mb-8">
+                <span class="text-xs font-semibold text-fusion tracking-widest uppercase block mb-1">Master Schedule</span>
+                <h2 class="text-2xl md:text-3xl font-light text-hematite tracking-wide">行程資訊總覽</h2>
+            </div>
             
-            <div class="bg-washi border-thick rounded-xl px-4 py-2 mt-2 shadow-solid-sm flex items-center gap-2">
-                <span class="text-sm font-bold">距離出發還有</span>
-                <span id="countdown-days" class="text-2xl font-black text-coral">--</span>
-                <span class="text-sm font-bold">天</span>
+            <!-- 精緻卡片佈局：橫向平滑滾動，文字精簡濃縮，高雅易讀 -->
+            <div class="overflow-x-auto no-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 min-w-[620px] md:min-w-0">
+                    
+                    <!-- Day 1 -->
+                    <div class="glass-panel rounded-3xl p-5 shadow-soft flex flex-col justify-between hover:shadow-hover transition-all">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-hematite text-lg">Day 1</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-vista text-hematite font-medium">8h</span>
+                            </div>
+                            <span class="text-[11px] text-cover font-medium block mb-3">13:45 - 22:00</span>
+                            <p class="text-xs text-hematite/90 font-medium leading-relaxed">
+                                抵達高雄 ➡️ 碼頭海風<br>
+                                橘線尋香 ➡️ 總館夜景
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 text-[11px] text-fusion font-medium">
+                            圖書館夜景接宵夜極順
+                        </div>
+                    </div>
+
+                    <!-- Day 2 -->
+                    <div class="glass-panel rounded-3xl p-5 shadow-soft flex flex-col justify-between hover:shadow-hover transition-all">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-hematite text-lg">Day 2</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-vista text-hematite font-medium">11h</span>
+                            </div>
+                            <span class="text-[11px] text-cover font-medium block mb-3">10:30 - 22:00</span>
+                            <p class="text-xs text-hematite/90 font-medium leading-relaxed">
+                                市區早午餐 ➡️ 旗津慢活<br>
+                                鼓山日落 ➡️ 青花驕
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 text-[11px] text-fusion font-medium">
+                            平日慢活旗津極 Chill
+                        </div>
+                    </div>
+
+                    <!-- Day 3 -->
+                    <div class="glass-panel rounded-3xl p-5 shadow-soft flex flex-col justify-between hover:shadow-hover transition-all">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-hematite text-lg">Day 3</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-vista text-hematite font-medium">12.5h</span>
+                            </div>
+                            <span class="text-[11px] text-cover font-medium block mb-3">11:00 - 23:30</span>
+                            <p class="text-xs text-hematite/90 font-medium leading-relaxed">
+                                蔦屋尋香 ➡️ 藤井風 💜<br>
+                                世運狂歡 ➡️ 瑞豐夜市
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 text-[11px] text-fusion font-medium">
+                            演唱會直通夜市宵夜場
+                        </div>
+                    </div>
+
+                    <!-- Day 4 -->
+                    <div class="glass-panel rounded-3xl p-5 shadow-soft flex flex-col justify-between hover:shadow-hover transition-all">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-hematite text-lg">Day 4</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-vista text-hematite font-medium">11h</span>
+                            </div>
+                            <span class="text-[11px] text-cover font-medium block mb-3">11:00 - 22:00</span>
+                            <p class="text-xs text-hematite/90 font-medium leading-relaxed">
+                                三民市場 ➡️ 駁二市集<br>
+                                夢時代 ➡️ 家樂福採買
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 text-[11px] text-fusion font-medium">
+                            週末文創與集中採買
+                        </div>
+                    </div>
+
+                    <!-- Day 5 -->
+                    <div class="glass-panel rounded-3xl p-5 shadow-soft flex flex-col justify-between hover:shadow-hover transition-all">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-hematite text-lg">Day 5</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-vista text-hematite font-medium">11h</span>
+                            </div>
+                            <span class="text-[11px] text-cover font-medium block mb-3">10:30 - 21:30</span>
+                            <p class="text-xs text-hematite/90 font-medium leading-relaxed">
+                                動漫街 ➡️ OSAMU快閃<br>
+                                巨蛋尋香 ➡️ 衛武營夕陽
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 text-[11px] text-fusion font-medium">
+                            二次元、特展與沙龍香
+                        </div>
+                    </div>
+
+                    <!-- Day 6 -->
+                    <div class="glass-panel rounded-3xl p-5 shadow-soft flex flex-col justify-between hover:shadow-hover transition-all">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-bold text-hematite text-lg">Day 6</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-vista text-hematite font-medium">4.5h</span>
+                            </div>
+                            <span class="text-[11px] text-cover font-medium block mb-3">09:30 - 14:15</span>
+                            <p class="text-xs text-hematite/90 font-medium leading-relaxed">
+                                三多早午餐 ➡️ 伴手禮<br>
+                                機場寄艙 ➡️ 登機返港
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 text-[11px] text-fusion font-medium">
+                            行李寄存，優雅收官
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </section>
 
-        <!-- Quick Info Cards -->
-        <div class="grid grid-cols-2 gap-4">
-            <!-- Flight -->
-            <div class="bg-yamabuki rounded-2xl border-thick p-4 shadow-solid flex flex-col gap-2">
-                <div class="flex items-center gap-2 font-bold border-b-3 border-ink pb-2">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.2-1.1.6L3 8l6 5-3 3-3.2-.8c-.4-.1-.8.2-1 .6L1 17l4 1 1 4 .8-1c.4-.2.7-.6.6-1l-.8-3.2 3-3 5 6 1.2-.7c.4-.2.7-.6.6-1.1z"/></svg>
-                    航班資訊
+        <!-- Detailed Itinerary Planner (Tabs) -->
+        <section id="itinerary" class="fade-up relative scroll-mt-28">
+            <div class="mb-8">
+                <span class="text-xs font-semibold text-fusion tracking-widest uppercase block mb-1">Daily Navigation</span>
+                <h2 class="text-2xl md:text-3xl font-light text-hematite tracking-wide">每日詳細導航</h2>
+            </div>
+            
+            <!-- Day Selector (膠囊切換器，無實線) -->
+            <div class="flex overflow-x-auto no-scrollbar gap-2.5 mb-8 -mx-4 px-4 md:mx-0 md:px-0 sticky top-[72px] z-30 bg-cloud/90 backdrop-blur-md py-3">
+                <button onclick="switchDay(1)" id="btn-day-1" class="day-btn active px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all bg-fusion text-white shadow-soft whitespace-nowrap">Day 1 • 29/10 (四)</button>
+                <button onclick="switchDay(2)" id="btn-day-2" class="day-btn px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all bg-white/70 text-hematite hover:bg-white whitespace-nowrap">Day 2 • 30/10 (五)</button>
+                <button onclick="switchDay(3)" id="btn-day-3" class="day-btn px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all bg-white/70 text-hematite hover:bg-white whitespace-nowrap">Day 3 • 31/10 (六)</button>
+                <button onclick="switchDay(4)" id="btn-day-4" class="day-btn px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all bg-white/70 text-hematite hover:bg-white whitespace-nowrap">Day 4 • 01/11 (日)</button>
+                <button onclick="switchDay(5)" id="btn-day-5" class="day-btn px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all bg-white/70 text-hematite hover:bg-white whitespace-nowrap">Day 5 • 02/11 (一)</button>
+                <button onclick="switchDay(6)" id="btn-day-6" class="day-btn px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-all bg-white/70 text-hematite hover:bg-white whitespace-nowrap">Day 6 • 03/11 (二)</button>
+            </div>
+
+            <!-- Content Area (Card Padding 32px - 48px，空間感分隔) -->
+            <div class="glass-panel rounded-[2.5rem] p-7 md:p-12 shadow-soft relative overflow-hidden min-h-[500px]">
+                
+                <!-- Day 1 Content -->
+                <div id="content-day-1" class="tab-content block">
+                    <div class="flex flex-col lg:flex-row gap-10 lg:gap-12">
+                        <div class="flex-1 space-y-8">
+                            <h3 class="text-xl md:text-2xl font-bold text-hematite tracking-wider">抵達高雄 ➡️ 碼頭海風 ➡️ 橘線一條龍 ➡️ 圖書館夜景 ➡️ 宵夜採買</h3>
+                            
+                            <div class="space-y-6">
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-airplane"></i> 12:15 - 15:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">啟程、抵達高雄與入住</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        從 <a href="https://www.google.com/maps/search/?api=1&query=香港國際機場" target="_blank" class="map-link">香港國際機場</a> 飛往 <a href="https://www.google.com/maps/search/?api=1&query=高雄國際機場" target="_blank" class="map-link">高雄國際機場</a>。捷運紅線搭至 <a href="https://www.google.com/maps/search/?api=1&query=三多商圈站" target="_blank" class="map-link">三多商圈站</a>（4 號出口步行 5 分鐘），登記入住 <a href="https://www.google.com/maps/search/?api=1&query=康橋商旅-三多商圈館" target="_blank" class="map-link">康橋商旅 - 三多商圈館</a> 放下隨身行李。
+                                    </p>
+                                </div>
+
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-sun-horizon"></i> 15:30 - 16:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">港灣黃昏海風</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        漫步至 <a href="https://www.google.com/maps/search/?api=1&query=新光碼頭+星光水岸公園" target="_blank" class="map-link">新光碼頭（星光水岸公園）</a> 吹海風，打卡 85 大樓海景與水岸港灣。
+                                    </p>
+                                </div>
+
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-drop"></i> 16:30 - 18:15
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">橘線散步甜品、日系器皿 ＆ 尋香第 1 站</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        搭捷運橘線至 <a href="https://www.google.com/maps/search/?api=1&query=五塊厝站" target="_blank" class="map-link">五塊厝站</a> / <a href="https://www.google.com/maps/search/?api=1&query=高雄+文化中心站" target="_blank" class="map-link">文化中心站</a>：
+                                    </p>
+                                    <ul class="text-sm md:text-base text-hematite/80 space-y-1.5 pl-2">
+                                        <li>🍽️ <a href="https://www.google.com/maps/search/?api=1&query=有碗碗盤+高雄" target="_blank" class="map-link">有碗碗盤器皿小物店</a>：18:00 關門前挖寶日系餐具</li>
+                                        <li>🧁 <a href="https://www.google.com/maps/search/?api=1&query=菱果+高雄" target="_blank" class="map-link">菱果 泡芙</a>：現灌酥脆手工泡芙</li>
+                                        <li>🌸 <a href="https://www.google.com/maps/search/?api=1&query=DT+STORE+苓雅門市" target="_blank" class="map-link">DT STORE 苓雅門市</a>：重點試香 LOE - Harsh Green</li>
+                                        <li>🧁 <a href="https://www.google.com/maps/search/?api=1&query=樹sugoeat+高雄" target="_blank" class="map-link">樹 sugoeat 泡芙</a>：外帶招牌人氣泡芙</li>
+                                    </ul>
+                                </div>
+
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-mist text-hematite">
+                                        <i class="ph-bold ph-fork-knife"></i> 18:30 - 21:00
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">在地晚餐 ＆ 百萬夜景</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        晚餐於 <a href="https://www.google.com/maps/search/?api=1&query=老潮派台灣麵食館+和平店" target="_blank" class="map-link">老潮派台灣麵食館 和平店</a> 享用牛肉拌麵與紅油抄手。隨後搭捷運回三多商圈，步行至 <a href="https://www.google.com/maps/search/?api=1&query=高雄市立圖書館總館" target="_blank" class="map-link">高雄市立圖書館總館</a> 頂樓空中花園眺望港灣夜景。
+                                    </p>
+                                </div>
+
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/90 text-hematite">
+                                        <i class="ph-bold ph-moon-stars"></i> 21:00 打後
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">酒店周邊夜間採買 ＆ 宵夜</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        🌶️ <a href="https://www.google.com/maps/search/?api=1&query=和三辣+高雄苓雅店" target="_blank" class="map-link">和三辣 麻辣燙 椒麻拌麵 苓雅店</a> 買麻辣鴨血 ➡️ 🍢 <a href="https://www.google.com/maps/search/?api=1&query=興中夜市" target="_blank" class="map-link">興中夜市</a>（滿不停宵夜、老牌白糖粿） ➡️ 🛒 <a href="https://www.google.com/maps/search/?api=1&query=7-ELEVEN+高雄三門市" target="_blank" class="map-link">7-ELEVEN 高雄三門市</a> 買 阿財黑糖發粿 ➡️ 🍜 <a href="https://www.google.com/maps/search/?api=1&query=台酒苓雅營業所" target="_blank" class="map-link">台酒苓雅營業所</a> 買 台酒麻辣乾拌麵。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Food Recommendation Sidebar -->
+                        <div class="lg:w-80">
+                            <div class="bg-white/60 rounded-3xl p-6 md:p-8 shadow-soft space-y-4">
+                                <h4 class="flex items-center gap-2 font-bold text-hematite text-sm tracking-wide">
+                                    <i class="ph ph-map-pin text-fusion text-lg"></i> 美食推薦 (苓雅區)
+                                </h4>
+                                <div class="space-y-3">
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=苓雅油煎肉圓" target="_blank" class="hover:text-fusion transition-colors">1. 苓雅油煎肉圓</a> <span class="text-xs text-cover font-medium ml-1">~$50</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">外皮酥脆的在地肉圓，在地人宵夜首選。</p>
+                                    </div>
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=烏弄+學源店" target="_blank" class="hover:text-fusion transition-colors">2. 烏弄 WUNONG (學源店)</a> <span class="text-xs text-cover font-medium ml-1">~$40</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">高雄無糖茶首選，解膩必備「名間鄉冬片仔」。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-sm font-bold mt-1 leading-relaxed">
-                    <p>10/29 12:15 ✈️ BR846</p>
-                    <p>11/03 16:40 ✈️ BR849</p>
+
+                <!-- Day 2 Content -->
+                <div id="content-day-2" class="tab-content hidden">
+                    <div class="flex flex-col lg:flex-row gap-10 lg:gap-12">
+                        <div class="flex-1 space-y-8">
+                            <h3 class="text-xl md:text-2xl font-bold text-hematite tracking-wider">市區慢活 Brunch ➡️ 平日旗津環島 ➡️ 隱藏版海景 ➡️ 青花驕 ➡️ 散步甜品</h3>
+                            <div class="space-y-6">
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-coffee"></i> 10:30 - 12:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">悠閒早午餐 ＆ 前往哈瑪星</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        於飯店或周邊悠閒享用早午餐後，搭乘捷運或輕軌前往 <a href="https://www.google.com/maps/search/?api=1&query=哈瑪星站" target="_blank" class="map-link">哈瑪星站</a>，準備展開離島慢活之旅。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-bicycle"></i> 12:30 - 17:00
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">平日離島慢活：旗津環島</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        由哈瑪星步行至 <a href="https://www.google.com/maps/search/?api=1&query=鼓山輪渡站" target="_blank" class="map-link">鼓山輪渡站</a> 搭船至 <a href="https://www.google.com/maps/search/?api=1&query=旗津輪渡站" target="_blank" class="map-link">旗津輪渡站</a>。租電動單車遊歷 <a href="https://www.google.com/maps/search/?api=1&query=旗津海岸公園" target="_blank" class="map-link">旗津海岸公園</a>、<a href="https://www.google.com/maps/search/?api=1&query=旗津彩虹教堂" target="_blank" class="map-link">彩虹教堂</a> 及 <a href="https://www.google.com/maps/search/?api=1&query=旗後砲台" target="_blank" class="map-link">旗後砲台</a>。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-bicycle"></i> 12:30 - 17:00
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">平日離島慢活：旗津環島</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        搭輕軌至 <a href="https://www.google.com/maps/search/?api=1&query=哈瑪星站" target="_blank" class="map-link">哈瑪星站</a> ➡️ <a href="https://www.google.com/maps/search/?api=1&query=鼓山輪渡站" target="_blank" class="map-link">鼓山輪渡站</a> 搭船至 <a href="https://www.google.com/maps/search/?api=1&query=旗津輪渡站" target="_blank" class="map-link">旗津輪渡站</a>。租電動單車遊歷 <a href="https://www.google.com/maps/search/?api=1&query=旗津海岸公園" target="_blank" class="map-link">旗津海岸公園</a>、<a href="https://www.google.com/maps/search/?api=1&query=旗津彩虹教堂" target="_blank" class="map-link">彩虹教堂</a> 及 <a href="https://www.google.com/maps/search/?api=1&query=旗後砲台" target="_blank" class="map-link">旗後砲台</a>。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-sun-horizon"></i> 17:00 - 19:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">隱藏海景夕陽 ＆ MLD 台鋁</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        渡輪返抵鼓山，散步至 <a href="https://www.google.com/maps/search/?api=1&query=碧港良居+The+Harbour" target="_blank" class="map-link">碧港良居 The Harbour 旁海傍</a> 看日落。隨後乘輕軌前往「軟體園區站」，漫遊 <a href="https://www.google.com/maps/search/?api=1&query=MLD+台鋁生活商場" target="_blank" class="map-link">MLD 台鋁生活商場</a> 逛台鋁書屋。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-mist text-hematite">
+                                        <i class="ph-bold ph-fork-knife"></i> 19:45 - 21:45
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">晚餐：青花驕麻辣鍋（已預約 19:45）</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        準時於 <a href="https://www.google.com/maps/search/?api=1&query=青花驕麻辣鍋+高雄台鋁店" target="_blank" class="map-link">青花驕麻辣鍋 高雄台鋁店</a> 享受招牌青花椒麻辣鍋晚餐。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/90 text-hematite">
+                                        <i class="ph-bold ph-cookie"></i> 21:45 打後
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">夜間散步甜品</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        搭捷運至中央公園/美麗島站：品嚐 🧋 <a href="https://www.google.com/maps/search/?api=1&query=乳夫煮茶+高雄" target="_blank" class="map-link">乳夫煮茶</a> 與買 🍰 <a href="https://www.google.com/maps/search/?api=1&query=莫妮日式精品+高雄" target="_blank" class="map-link">莫妮日式精品</a> 甜點。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:w-80">
+                            <div class="bg-white/60 rounded-3xl p-6 md:p-8 shadow-soft space-y-4">
+                                <h4 class="flex items-center gap-2 font-bold text-hematite text-sm tracking-wide"><i class="ph ph-map-pin text-fusion text-lg"></i> 美食推薦 (旗津/哈瑪星)</h4>
+                                <div class="space-y-3">
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=旗津不一樣赤肉羹" target="_blank" class="hover:text-fusion transition-colors">1. 旗津不一樣赤肉羹</a> <span class="text-xs text-cover font-medium ml-1">~$70</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">酥炸肉塊再煮羹，外酥內嫩的在地名物。</p>
+                                    </div>
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=新濱・駅前" target="_blank" class="hover:text-fusion transition-colors">2. 新濱・駅前</a> <span class="text-xs text-cover font-medium ml-1">~$150</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">百年舊三和銀行改建，冰滴冷萃極有質感。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 3 Content -->
+                <div id="content-day-3" class="tab-content hidden">
+                    <div class="flex flex-col lg:flex-row gap-10 lg:gap-12">
+                        <div class="flex-1 space-y-8">
+                            <h3 class="text-xl md:text-2xl font-bold text-hematite tracking-wider">尋香連線 ➡️ 拉麵 ➡️ 藤井風演唱會 💜 ➡️ 瑞豐夜市掃街</h3>
+                            <div class="space-y-6">
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-drop"></i> 11:00 - 14:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">尋香第 2 & 3 站 ＆ 拉麵午餐</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        11:00 前往 <a href="https://www.google.com/maps/search/?api=1&query=TSUTAYA+BOOKSTORE+大立店" target="_blank" class="map-link">TSUTAYA BOOKSTORE 大立店</a> 試香 EYECANDLE - 黑茶。<br>
+                                        12:00 步行至漢神本館旁 <a href="https://www.google.com/maps/search/?api=1&query=らーめん壱+Ramen+Ichi" target="_blank" class="map-link">らーめん壱 Ramen Ichi</a> 享用拉麵午餐。<br>
+                                        13:30 前往 <a href="https://www.google.com/maps/search/?api=1&query=漢神百貨本館" target="_blank" class="map-link">漢神百貨本館 5F (UUIN 專櫃)</a> 試香 P.Seven - 獵 / 石縫之花 / 茗香水。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-battery-charging"></i> 14:30 - 17:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">回飯店充電 ＆ 左營補給</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        返回 <a href="https://www.google.com/maps/search/?api=1&query=康橋商旅-三多商圈館" target="_blank" class="map-link">康橋商旅 - 三多商圈館</a> 快速充電與整理物資。16:15 搭捷運紅線至 <a href="https://www.google.com/maps/search/?api=1&query=新光三越+左營店" target="_blank" class="map-link">新光三越左營店 / 左營站</a> 輕食補給。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-fusion/15 text-fusion">
+                                        <i class="ph-bold ph-music-notes"></i> 17:30 - 22:00
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">💜 藤井風演唱會：高雄國家體育場（世運主場館）</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        入場 <a href="https://www.google.com/maps/search/?api=1&query=高雄國家體育場" target="_blank" class="map-link">高雄國家體育場 (世運主場館)</a> 享受藤井風帶來的音樂盛宴！
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/90 text-hematite">
+                                        <i class="ph-bold ph-storefront"></i> 22:00 打後
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">散場接駁 ＆ 瑞豐夜市大掃街</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        由世運站搭捷運紅線往南 3 個站直達「巨蛋站」，直奔 <a href="https://www.google.com/maps/search/?api=1&query=瑞豐夜市" target="_blank" class="map-link">瑞豐夜市</a> 宵夜大掃街（必試：萬國牛排、天使雞排、QQ蛋）。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:w-80">
+                            <div class="bg-white/60 rounded-3xl p-6 md:p-8 shadow-soft space-y-4">
+                                <h4 class="flex items-center gap-2 font-bold text-hematite text-sm tracking-wide"><i class="ph ph-map-pin text-fusion text-lg"></i> 美食推薦 (左營/巨蛋)</h4>
+                                <div class="space-y-3">
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=菜市仔嬤左營汾陽餛飩+高鐵店" target="_blank" class="hover:text-fusion transition-colors">1. 汾陽餛飩 (高鐵店)</a> <span class="text-xs text-cover font-medium ml-1">~$90</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">左營站墊胃首選，湯鮮肉美皮滑嫩。</p>
+                                    </div>
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=曾氏福建炒麵+瑞豐夜市" target="_blank" class="hover:text-fusion transition-colors">2. 曾氏福建炒麵</a> <span class="text-xs text-cover font-medium ml-1">~$100</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">大火猛炒鍋氣十足，散場後熱辣解饞。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 4 Content -->
+                <div id="content-day-4" class="tab-content hidden">
+                    <div class="flex flex-col lg:flex-row gap-10 lg:gap-12">
+                        <div class="flex-1 space-y-8">
+                            <h3 class="text-xl md:text-2xl font-bold text-hematite tracking-wider">三民市場 Lunch ➡️ 駁二週末市集 ➡️ 夢時代 ➡️ 家樂福 ➡️ 自強夜市</h3>
+                            <div class="space-y-6">
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-mist text-hematite">
+                                        <i class="ph-bold ph-bowl-food"></i> 11:00 - 12:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">三民第一公有市場午餐</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        造訪歷史悠久的 <a href="https://www.google.com/maps/search/?api=1&query=三民第一公有市場" target="_blank" class="map-link">三民第一公有市場</a>，必吃 <a href="https://www.google.com/maps/search/?api=1&query=廖家黑輪" target="_blank" class="map-link">廖家黑輪</a>、<a href="https://www.google.com/maps/search/?api=1&query=侯記鴨肉飯" target="_blank" class="map-link">侯記鴨肉飯</a> 與 <a href="https://www.google.com/maps/search/?api=1&query=老周冷飲店" target="_blank" class="map-link">老周冷飲店</a>。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-palette"></i> 12:30 - 17:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">鹽埕 ＆ 駁二藝術特區漫步</h4>
+                                    <ul class="text-sm md:text-base text-hematite/80 space-y-1.5 pl-2">
+                                        <li>🧸 <a href="https://www.google.com/maps/search/?api=1&query=溢起瘋扭蛋" target="_blank" class="map-link">溢起瘋扭蛋</a>：朝聖海量特色扭蛋</li>
+                                        <li>🛍️ <a href="https://www.google.com/maps/search/?api=1&query=巴堂蜂蜜蛋糕" target="_blank" class="map-link">巴堂蜂蜜蛋糕</a>：買百年傳統長崎雙目糖蛋糕</li>
+                                        <li>🎨 <a href="https://www.google.com/maps/search/?api=1&query=駁二藝術特區+C5倉庫" target="_blank" class="map-link">駁二藝術特區 C5 倉庫</a>：參觀主題展覽，慢逛大勇/大義週末文創市集</li>
+                                        <li>🥞 <a href="https://www.google.com/maps/search/?api=1&query=駁二車輪餅" target="_blank" class="map-link">駁二車輪餅</a>：排隊現烤爆餡甜點</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-shopping-cart"></i> 17:30 - 21:00
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">夢時代購物中心 ＆ 家樂福大採買</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        乘輕軌直達 <a href="https://www.google.com/maps/search/?api=1&query=統一夢時代購物中心" target="_blank" class="map-link">夢時代購物中心</a>（逛 3F POP MART 旗艦店、B1F 咖樂迪咖啡農場）。隨後前往 <a href="https://www.google.com/maps/search/?api=1&query=家樂福+成功店" target="_blank" class="map-link">家樂福 成功店</a> 集中採買台灣伴手禮放回飯店。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/90 text-hematite">
+                                        <i class="ph-bold ph-moon-stars"></i> 21:00 打後
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">自強夜市（苓雅夜市）</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        步行至 <a href="https://www.google.com/maps/search/?api=1&query=自強夜市+苓雅夜市" target="_blank" class="map-link">自強夜市 (苓雅夜市)</a> 晚餐宵夜：必吃南豐魯肉飯、老牌白糖粿、甘家冷凍芋。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:w-80">
+                            <div class="bg-white/60 rounded-3xl p-6 md:p-8 shadow-soft space-y-4">
+                                <h4 class="flex items-center gap-2 font-bold text-hematite text-sm tracking-wide"><i class="ph ph-map-pin text-fusion text-lg"></i> 美食推薦 (鹽埕/自強)</h4>
+                                <div class="space-y-3">
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=鹽埕吳家金桔豆花" target="_blank" class="hover:text-fusion transition-colors">1. 鹽埕吳家金桔豆花</a> <span class="text-xs text-cover font-medium ml-1">~$45</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">酸甜金桔豆花，逛完駁二的降溫解膩良伴。</p>
+                                    </div>
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=名都飲食店+高雄" target="_blank" class="hover:text-fusion transition-colors">2. 名都飲食店</a> <span class="text-xs text-cover font-medium ml-1">~$80</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">自強夜市老字號陽春麵與現切煙燻滷味。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 5 Content -->
+                <div id="content-day-5" class="tab-content hidden">
+                    <div class="flex flex-col lg:flex-row gap-10 lg:gap-12">
+                        <div class="flex-1 space-y-8">
+                            <h3 class="text-xl md:text-2xl font-bold text-hematite tracking-wider">動漫尋寶 ➡️ 精緻午餐 ➡️ 內惟 OSAMU快閃 ➡️ 巨蛋尋香/甜品 ➡️ 衛武營黃昏 ➡️ 貴方牛鳴 ➡️ 六合夜市</h3>
+                            <div class="space-y-6">
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-game-controller"></i> 10:30 - 12:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">動漫尋寶與經典手信</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        搭捷運前往 <a href="https://www.google.com/maps/search/?api=1&query=高雄車站地下街" target="_blank" class="map-link">高雄車站地下街</a> 尋寶一番賞與模型周邊。隨後至後驛站 <a href="https://www.google.com/maps/search/?api=1&query=如邑堂餅家+高雄博愛店" target="_blank" class="map-link">如邑堂餅家 高雄博愛店</a> 採購鐵觀音鳳梨酥。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-mist text-hematite">
+                                        <i class="ph-bold ph-fork-knife"></i> 12:45 - 14:15
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">精緻午餐 ＆ 手搖飲</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        午餐前往凹子底站的 <a href="https://www.google.com/maps/search/?api=1&query=赤燒分子廚藝" target="_blank" class="map-link">赤燒分子廚藝</a> 品嚐平日中午限定雞飯；餐後買杯 <a href="https://www.google.com/maps/search/?api=1&query=侍茶匠+左營富國店" target="_blank" class="map-link">侍茶匠 左營富國店</a> 的職人手搖。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-sparkle"></i> 14:15 - 15:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">內惟藝術中心：OSAMU GOODS 50 週年快閃展</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        午餐後搭乘輕軌至「內惟藝術中心站」，前往 <a href="https://www.google.com/maps/search/?api=1&query=內惟藝術中心" target="_blank" class="map-link">內惟藝術中心</a> 參觀「OSAMU GOODS 50 週年快閃展」，打卡可愛原創周邊與藝術空間。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-drop"></i> 15:30 - 17:00
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">尋香第 4 站 ＆ 漢神巨蛋甜品名產</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        搭輕軌/捷運至 <a href="https://www.google.com/maps/search/?api=1&query=漢神巨蛋購物廣場" target="_blank" class="map-link">漢神巨蛋購物廣場</a> 3F 尋香：Youssoful、Obvious Perfumes、Goldfield & Banks。<br>
+                                        順便至 B1F 購買 <a href="https://www.google.com/maps/search/?api=1&query=青鳥旅行+漢神巨蛋" target="_blank" class="map-link">青鳥旅行 漢神巨蛋專櫃</a> 灌餡蛋捲，並搶購 <a href="https://www.google.com/maps/search/?api=1&query=HOHOS+甜點實驗室+漢神巨蛋" target="_blank" class="map-link">HOHOS 甜點實驗室</a> 高雄限定布丁燒與厚燒巴斯克。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-tree"></i> 17:00 - 19:45
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">衛武營黃昏、木侖花生糖 ＆ 貴方牛鳴晚餐</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        乘捷運橘線至 <a href="https://www.google.com/maps/search/?api=1&query=衛武營國家藝術文化中心" target="_blank" class="map-link">衛武營國家藝術文化中心</a> 草坪散步看夕陽與建築；前往買 <a href="https://www.google.com/maps/search/?api=1&query=木侖花生糖+鳳山總店" target="_blank" class="map-link">木侖花生糖 鳳山總店</a>。晚餐於 <a href="https://www.google.com/maps/search/?api=1&query=貴方牛鳴" target="_blank" class="map-link">貴方牛鳴</a> 品味招牌牛肉麵與熟炊釜飯。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/90 text-hematite">
+                                        <i class="ph-bold ph-bag"></i> 20:00 - 21:30
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">手信補貨 ＆ 六合夜市掃街</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        美麗島站出閘，前往 <a href="https://www.google.com/maps/search/?api=1&query=不二緻果+美麗島門市" target="_blank" class="map-link">不二緻果 美麗島門市</a> 買經典真芋頭蛋糕；接著直上 <a href="https://www.google.com/maps/search/?api=1&query=六合夜市" target="_blank" class="map-link">六合夜市</a> 11號出口直衝「<a href="https://www.google.com/maps/search/?api=1&query=魷布院+六合夜市" target="_blank" class="map-link">魷布院</a>」買香脆烤魷魚。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:w-80">
+                            <div class="bg-white/60 rounded-3xl p-6 md:p-8 shadow-soft space-y-4">
+                                <h4 class="flex items-center gap-2 font-bold text-hematite text-sm tracking-wide"><i class="ph ph-shield-check text-fusion text-lg"></i> 週一美食備案</h4>
+                                <div class="space-y-3">
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=鼎泰豐+漢神巨蛋店" target="_blank" class="hover:text-fusion transition-colors">1. 鼎泰豐 漢神巨蛋店</a></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">若赤燒分子廚藝臨時公休，巨蛋 B1F 排骨炒飯最穩妥。</p>
+                                    </div>
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=鳳山老爺美食館" target="_blank" class="hover:text-fusion transition-colors">2. 鳳山老爺美食館</a></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">若貴方牛鳴休店，焦糖燻鴨與香茅煎肉是強大備選。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 6 Content -->
+                <div id="content-day-6" class="tab-content hidden">
+                    <div class="flex flex-col lg:flex-row gap-10 lg:gap-12">
+                        <div class="flex-1 space-y-8">
+                            <h3 class="text-xl md:text-2xl font-bold text-hematite tracking-wider">市區 Brunch ➡️ 最後補貨 ➡️ 登機返港</h3>
+                            <div class="space-y-6">
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-coffee"></i> 09:30 - 13:45
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">Check-out 寄行李 ＆ 三多早午餐放空</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        09:30 辦理退房並將大型行李寄存於 <a href="https://www.google.com/maps/search/?api=1&query=康橋商旅-三多商圈館" target="_blank" class="map-link">康橋商旅 - 三多商圈館</a>。於三多商圈悠閒享用早午餐、咖啡店放空及最後手信採買。
+                                    </p>
+                                </div>
+                                <div class="bg-white/60 rounded-3xl p-6 md:p-8 space-y-2.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-vista text-hematite">
+                                        <i class="ph-bold ph-airplane-takeoff"></i> 13:45 - 18:25
+                                    </span>
+                                    <h4 class="font-bold text-hematite text-base md:text-lg">機場託運與登機（BR849）</h4>
+                                    <p class="text-sm md:text-base text-hematite/80 leading-relaxed font-normal">
+                                        13:45 返回飯店取回行李，乘捷運紅線直達 <a href="https://www.google.com/maps/search/?api=1&query=高雄國際機場" target="_blank" class="map-link">高雄國際機場</a>。<br>
+                                        14:15 辦理登機託運手續（<span class="text-fusion font-semibold">謹記香水、所有液體及果凍伴手禮均須寄艙</span>）。<br>
+                                        16:40 搭乘長榮航空 BR849 航班啟程返回香港（預計 18:25 抵港）。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:w-80">
+                            <div class="bg-white/60 rounded-3xl p-6 md:p-8 shadow-soft space-y-4">
+                                <h4 class="flex items-center gap-2 font-bold text-hematite text-sm tracking-wide"><i class="ph ph-map-pin text-fusion text-lg"></i> 美食推薦 (三多商圈)</h4>
+                                <div class="space-y-3">
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=步道咖啡+Cafe+Strada" target="_blank" class="hover:text-fusion transition-colors">1. 步道咖啡 Cafe Strada</a> <span class="text-xs text-cover font-medium ml-1">~$300</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">老派文青咖啡館，單品手沖與輕食水準極高。</p>
+                                    </div>
+                                    <div class="p-4 bg-white/80 rounded-2xl space-y-1.5">
+                                        <p class="font-bold text-hematite text-sm"><a href="https://www.google.com/maps/search/?api=1&query=老江紅茶牛奶+三多店" target="_blank" class="hover:text-fusion transition-colors">2. 老江紅茶牛奶 (三多店)</a> <span class="text-xs text-cover font-medium ml-1">~$100</span></p>
+                                        <p class="text-xs text-hematite/70 font-normal leading-relaxed">半熟蛋火腿吐司搭配招牌厚奶香紅茶牛奶。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Fragrance Guide (尋香行事曆與完整清單) -->
+        <section id="fragrance" class="fade-up scroll-mt-28">
+            <div class="mb-8">
+                <span class="text-xs font-semibold text-fusion tracking-widest uppercase block mb-1">Fragrance Guide</span>
+                <h2 class="text-2xl md:text-3xl font-light text-hematite tracking-wide">尋香行事曆與完整清單</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6 md:gap-8">
+                <!-- Fragrance Card 1 -->
+                <div class="glass-panel rounded-[2rem] p-7 md:p-9 shadow-soft hover:shadow-hover transition-all flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-cover mb-2 block tracking-wide">Day 1 • 16:30 | DT STORE 苓雅門市</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-hematite mb-2">LOE (Life on Earth) <span class="text-sm font-normal text-cover ml-2">🇰🇷 韓國</span></h3>
+                        <p class="text-sm font-semibold text-fusion mb-4">重點試香：Harsh Green (淡香水 EDT)</p>
+                        <p class="text-xs md:text-sm text-hematite/80 mb-5 leading-relaxed flex items-start gap-2">
+                            <i class="ph ph-leaf mt-1 text-fusion"></i> 綠葉、草本、檸檬 ➡️ 櫻花、茉莉 ➡️ 白麝香
+                        </p>
+                    </div>
+                    <div class="bg-white/60 p-4 md:p-5 rounded-2xl text-xs text-hematite/80 leading-relaxed">
+                        <span class="font-bold text-fusion">💡 攻略：</span> 極致綠意乾淨清新，柑橘草本調揮發較快，留意留香是否符合高持久需求。
+                    </div>
+                </div>
+
+                <!-- Fragrance Card 2 -->
+                <div class="glass-panel rounded-[2rem] p-7 md:p-9 shadow-soft hover:shadow-hover transition-all flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-semibold text-cover mb-2 block tracking-wide">Day 3 • 11:00 | TSUTAYA BOOKSTORE (高雄大立店)</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-hematite mb-2">EYECANDLE <span class="text-sm font-normal text-cover ml-2">🇹🇼 台灣</span></h3>
+                        <p class="text-sm font-semibold text-fusion mb-4">重點試香：黑茶 Black Tea (滾珠香水油 / 淡香精)</p>
+                        <p class="text-xs md:text-sm text-hematite/80 mb-5 leading-relaxed flex items-start gap-2">
+                            <i class="ph ph-leaf mt-1 text-fusion"></i> 佛手柑茶、香檸檬 ➡️ 黑茶、中國烏龍 ➡️ 煙草、雪松
+                        </p>
+                    </div>
+                    <div class="bg-white/60 p-4 md:p-5 rounded-2xl text-xs text-hematite/80 leading-relaxed">
+                        <span class="font-bold text-fusion">💡 攻略：</span> 完美平衡「乾淨茶香」與「沉穩木味」，滾珠香水油貼膚且揮發慢，持久度極佳。
+                    </div>
+                </div>
+
+                <!-- Fragrance Card 3 (P.Seven) -->
+                <div class="glass-panel rounded-[2.5rem] p-7 md:p-11 shadow-soft hover:shadow-hover transition-all md:col-span-2">
+                    <div class="flex flex-col lg:flex-row gap-8 lg:gap-10">
+                        <div class="lg:w-1/2 space-y-5">
+                            <div>
+                                <span class="text-xs font-semibold text-cover mb-2 block tracking-wide">Day 3 • 13:30 | 漢神百貨本館 5F (UUIN 專櫃)</span>
+                                <h3 class="text-xl md:text-2xl font-bold text-hematite mb-1.5">P.Seven (雨晴香水) <span class="text-sm font-normal text-cover ml-2">🇹🇼 台灣</span></h3>
+                                <p class="text-sm font-semibold text-fusion">本次「尋找台灣靈魂」主戰場</p>
+                            </div>
+                            
+                            <div class="space-y-3 text-sm text-hematite/80">
+                                <div class="bg-white/60 p-4 md:p-5 rounded-2xl space-y-1">
+                                    <strong class="text-hematite font-bold block text-sm">台灣茗香水 Oolong Tea (極致乾淨首選)</strong>
+                                    <p class="text-xs text-hematite/75 leading-relaxed">森林杉木 ➡️ 台灣烏龍茶 ➡️ 墨水、廣藿香</p>
+                                </div>
+                                <div class="bg-white/60 p-4 md:p-5 rounded-2xl space-y-1">
+                                    <strong class="text-hematite font-bold block text-sm">石縫之花 Flower of Life</strong>
+                                    <p class="text-xs text-hematite/75 leading-relaxed">醇酒廣藿香、泥土苔蘚 ➡️ 雪松、檀香</p>
+                                </div>
+                            </div>
+                            <div class="bg-white/60 p-4 md:p-5 rounded-2xl text-xs text-hematite/80 leading-relaxed">
+                                <span class="font-bold text-fusion">💡 攻略：</span> 清透乾淨首推「台灣茗香水」；追求沉穩木味與留香推薦「石縫之花」與「獵」。
+                            </div>
+                        </div>
+                        
+                        <!-- 價格參考 -->
+                        <div class="lg:w-1/2 bg-white/60 rounded-3xl p-6 md:p-8 space-y-3.5">
+                            <h4 class="font-bold text-hematite text-sm tracking-wider">人氣茶香系列參考</h4>
+                            <div class="space-y-2.5">
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="font-semibold text-xs md:text-sm text-hematite">茗 香水 / 金桂</span>
+                                    <span class="text-xs text-cover">金萱茶 / 桂花茶香交織</span>
+                                </div>
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="font-semibold text-xs md:text-sm text-hematite">Oolong Tea 沁香</span>
+                                    <span class="text-xs text-cover">綠茶清純與茉莉花香</span>
+                                </div>
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="font-semibold text-xs md:text-sm text-hematite">Formosa Beau-Tea</span>
+                                    <span class="text-xs text-cover">東方美人茶靈感</span>
+                                </div>
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="font-semibold text-xs md:text-sm text-hematite">Aged Tea 暗香</span>
+                                    <span class="text-xs text-cover">烏龍、暗梅與檜木</span>
+                                </div>
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="font-semibold text-xs md:text-sm text-hematite">Honyun / Ruby</span>
+                                    <span class="text-xs text-cover">紅玉紅茶 (台茶18號)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fragrance Card 4 -->
+                <div class="glass-panel rounded-[2.5rem] p-7 md:p-11 shadow-soft hover:shadow-hover transition-all md:col-span-2">
+                    <span class="text-xs font-semibold text-cover mb-2 block tracking-wide">Day 5 • 14:45 | 漢神巨蛋購物廣場 3F</span>
+                    <h3 class="text-xl md:text-2xl font-bold text-hematite mb-6">國際沙龍香水尋寶</h3>
+                    <div class="grid md:grid-cols-3 gap-5 md:gap-6">
+                        <div class="bg-white/60 p-5 md:p-6 rounded-3xl space-y-2">
+                            <h4 class="font-bold text-hematite text-base">Youssoful <span class="text-xs text-cover font-normal ml-1">🇰🇷</span></h4>
+                            <p class="text-xs text-fusion font-semibold">推薦：Saint Moritz (聖莫里茲)</p>
+                            <p class="text-xs text-hematite/70 leading-relaxed">極高人氣白麝香/無花果，宛如剛沖完涼的溫柔乾淨感。</p>
+                        </div>
+                        <div class="bg-white/60 p-5 md:p-6 rounded-3xl space-y-2">
+                            <h4 class="font-bold text-hematite text-base">Obvious Perfumes <span class="text-xs text-cover font-normal ml-1">🇫🇷</span></h4>
+                            <p class="text-xs text-fusion font-semibold">推薦：Une Tige (綠茎)、Une Rose</p>
+                            <p class="text-xs text-hematite/70 leading-relaxed">法式極簡沙龍香，精準還原植物純粹乾淨香韻。</p>
+                        </div>
+                        <div class="bg-white/60 p-5 md:p-6 rounded-3xl space-y-2">
+                            <h4 class="font-bold text-hematite text-base">Goldfield & Banks <span class="text-xs text-cover font-normal ml-1">🇦🇺</span></h4>
+                            <p class="text-xs text-fusion font-semibold">推薦：Pacific Rock Moss</p>
+                            <p class="text-xs text-hematite/70 leading-relaxed">頂級海洋苔蘚乾淨調，清新怡人。</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- Hotel -->
-            <div class="bg-coral text-washi rounded-2xl border-thick p-4 shadow-solid flex flex-col gap-2">
-                <div class="flex items-center gap-2 font-bold border-b-3 border-ink pb-2">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 22v-6.57"/><path d="M12 11h.01"/><path d="M12 7h.01"/><path d="M14 15.43V22"/><path d="M15 16a5 5 0 0 0-6 0"/><path d="M16 11h.01"/><path d="M16 7h.01"/><path d="M8 11h.01"/><path d="M8 7h.01"/><rect x="4" y="2" width="16" height="20" rx="2"/></svg>
-                    住宿資訊
+        </section>
+
+        <!-- Lucky Wheel Section (美食決策幸運輪盤) -->
+        <section id="wheel-section" class="fade-up scroll-mt-28">
+            <div class="mb-8">
+                <span class="text-xs font-semibold text-fusion tracking-widest uppercase block mb-1">Decision Maker</span>
+                <h2 class="text-2xl md:text-3xl font-light text-hematite tracking-wide">美食決策幸運輪盤</h2>
+            </div>
+
+            <div class="glass-panel rounded-[2.5rem] p-6 md:p-12 shadow-soft text-center flex flex-col items-center">
+                <!-- Segmented Control (膠囊分段控制器) -->
+                <div class="inline-flex p-1.5 rounded-full bg-white/70 shadow-sm mb-10 max-w-full overflow-x-auto no-scrollbar">
+                    <button onclick="changeWheelCategory(0)" id="cat-btn-0" class="wheel-cat-btn px-5 py-2 rounded-full text-xs md:text-sm font-semibold transition-all bg-fusion text-white shadow-soft whitespace-nowrap">飲品 / 奶茶</button>
+                    <button onclick="changeWheelCategory(1)" id="cat-btn-1" class="wheel-cat-btn px-5 py-2 rounded-full text-xs md:text-sm font-semibold transition-all text-hematite hover:text-fusion whitespace-nowrap">正餐 / 主食</button>
+                    <button onclick="changeWheelCategory(2)" id="cat-btn-2" class="wheel-cat-btn px-5 py-2 rounded-full text-xs md:text-sm font-semibold transition-all text-hematite hover:text-fusion whitespace-nowrap">早餐 / 宵夜</button>
+                    <button onclick="changeWheelCategory(3)" id="cat-btn-3" class="wheel-cat-btn px-5 py-2 rounded-full text-xs md:text-sm font-semibold transition-all text-hematite hover:text-fusion whitespace-nowrap">夜市清單</button>
                 </div>
-                <div class="text-sm font-bold mt-1 leading-relaxed">
-                    <p><a href="https://www.google.com/maps/search/?api=1&query=康橋商旅-三多商圈館" target="_blank" class="underline decoration-2 underline-offset-2 hover:bg-washi hover:text-coral px-1 rounded transition-colors -ml-1">🏨 康橋商旅-三多館</a></p>
-                    <p class="text-xs mt-1">📞 +886 7 537 9800</p>
+
+                <!-- 核心輪盤區 -->
+                <div class="relative w-[320px] h-[320px] md:w-[400px] md:h-[400px] flex items-center justify-center my-2">
+                    <!-- 指針 (簡約幾何三角形，指向上方 12點鐘方位) -->
+                    <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none drop-shadow-md">
+                        <svg width="26" height="30" viewBox="0 0 24 28" fill="none">
+                            <path d="M12 28L2 4C1.2 2.4 2.3 0.5 4.1 0.5H19.9C21.7 0.5 22.8 2.4 22 4L12 28Z" fill="#736B67" />
+                        </svg>
+                    </div>
+
+                    <!-- Canvas 輪盤 (CSS 控制顯示大小，JS 自動以高清倍率繪製) -->
+                    <canvas id="wheel-canvas" class="w-full h-full rounded-full drop-shadow-md transition-transform duration-75"></canvas>
+
+                    <!-- 中心圓形按鈕 -->
+                    <button onclick="spinWheel()" id="wheel-center-btn" class="absolute w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/95 backdrop-blur-md shadow-soft flex flex-col items-center justify-center text-hematite z-10 active:scale-95 transition-transform border border-white/60 focus:outline-none">
+                        <span class="text-xs md:text-sm font-bold tracking-widest text-fusion">SPIN</span>
+                        <span class="text-[10px] text-cover font-medium">旋轉</span>
+                    </button>
+                </div>
+
+                <!-- 輪盤下方主按鈕 -->
+                <div class="mt-10">
+                    <button onclick="spinWheel()" id="spin-main-btn" class="inline-flex items-center gap-2 px-9 py-3.5 rounded-full bg-fusion text-white text-sm md:text-base font-semibold shadow-soft hover:bg-fusion/90 active:scale-95 transition-all">
+                        <i class="ph-bold ph-sparkle text-lg"></i>
+                        <span>幫我決定！</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 結果展示彈窗 (Result Fade-in Modal) -->
+        <div id="wheel-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-hematite/25 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+            <div id="wheel-modal-card" class="glass-panel bg-white/95 rounded-[2.5rem] p-8 md:p-10 max-w-sm w-full text-center shadow-soft transform scale-95 transition-transform duration-300 space-y-6">
+                <div class="w-14 h-14 rounded-full bg-fusion/10 text-fusion flex items-center justify-center mx-auto text-2xl">
+                    <i class="ph-bold ph-bowl-food"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-cover tracking-widest uppercase block mb-1">今日命定之選</span>
+                    <h3 id="wheel-result-text" class="text-2xl md:text-3xl font-bold text-hematite tracking-wide mt-2">--</h3>
+                </div>
+                <div class="space-y-3 pt-2">
+                    <button onclick="closeWheelModal()" class="w-full py-3 rounded-full bg-fusion text-white text-sm font-semibold shadow-soft hover:bg-fusion/90 active:scale-95 transition-all">
+                        就食呢個！
+                    </button>
+                    <button onclick="retryWheel()" class="w-full py-3 rounded-full bg-white/70 text-hematite text-sm font-medium hover:bg-white active:scale-95 transition-all">
+                        再轉一次
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Smart Alerts Section -->
-        <section id="alerts" class="mt-2 scroll-mt-24">
-            <h2 class="text-xl font-black mb-3 flex items-center gap-2">
-                <svg class="w-6 h-6 text-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                智能除錯與動態調整
-            </h2>
-            <div class="bg-washi border-thick rounded-2xl p-4 shadow-solid flex flex-col gap-3">
-                <div class="flex gap-3">
-                    <span class="text-xl">🌅</span>
-                    <div>
-                        <p class="font-bold text-ink">Day 2 隱藏海景時間段</p>
-                        <p class="text-sm font-medium text-gray-700 mt-1">10月底高雄日落約 17:15，若 17:00 才搭船會錯過。💡 建議 <strong>16:45</strong> 前搭上渡輪，17:00 準時抵達「碧港良居」旁海傍。</p>
-                    </div>
+        <!-- Checklist (待辦清單：包含 chiikawa公仔，支援互動打勾) -->
+        <section id="checklist-section" class="fade-up max-w-xl mx-auto pb-16 scroll-mt-28">
+            <div class="glass-panel rounded-[2.5rem] p-7 md:p-10 shadow-soft">
+                <div class="mb-6">
+                    <span class="text-xs font-semibold text-fusion tracking-widest uppercase block mb-1">Essential Items</span>
+                    <h2 class="text-xl md:text-2xl font-light text-hematite flex items-center gap-2.5">
+                        <i class="ph-bold ph-check-square-offset text-fusion text-2xl"></i> 出發 Checklist
+                    </h2>
                 </div>
-                <div class="h-px bg-ink w-full opacity-20"></div>
-                <div class="flex gap-3">
-                    <span class="text-xl">⚠️</span>
-                    <div>
-                        <p class="font-bold text-ink">Day 5 星期一公休魔咒</p>
-                        <p class="text-sm font-medium text-gray-700 mt-1">台灣許多店週一公休。💡 若遇突發店休，巨蛋有「鼎泰豐」，衛武營有「鳳山老爺美食館」作為無休強大備案。</p>
-                    </div>
+                
+                <div class="space-y-2.5" id="checklist">
+                    <!-- 由 JavaScript 動態生成 9 項指定清單 -->
                 </div>
-                <div class="h-px bg-ink w-full opacity-20"></div>
-                <div class="flex gap-3">
-                    <span class="text-xl">🧳</span>
-                    <div>
-                        <p class="font-bold text-ink">演唱會散場與行李法規</p>
-                        <p class="text-sm font-medium text-gray-700 mt-1">Day 3 完場後「世運站」將管制，可騎 YouBike 至左營站。💡 購買的果凍與香水「絕對不可」手提，務必寄艙。</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Itinerary Section -->
-        <section id="itinerary" class="mt-4 scroll-mt-20">
-            <h2 class="text-xl font-black mb-4 flex items-center gap-2">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                每日行程
-            </h2>
-
-            <!-- Day Tabs -->
-            <div class="flex overflow-x-auto hide-scroll gap-2 pb-2 mb-4" id="tabs-container">
-                <!-- Tabs injected by JS -->
-            </div>
-
-            <!-- Timeline Content -->
-            <div class="bg-washi border-thick rounded-3xl p-5 shadow-solid min-h-[400px]">
-                <div class="flex justify-between items-center mb-6 border-b-3 border-ink pb-3">
-                    <div>
-                        <h3 id="daily-title" class="text-lg font-black text-coral">Day 1: 抵港 ➡️ 碼頭海風</h3>
-                        <p id="daily-date" class="text-sm font-bold text-gray-500">10月29日 (四)</p>
-                    </div>
-                    <div id="daily-hours" class="bg-wakatake px-2 py-1 rounded-lg border-2 border-ink text-xs font-bold whitespace-nowrap">
-                        停留: 8 小時
-                    </div>
-                </div>
-
-                <div id="timeline-container" class="relative">
-                    <!-- Events injected by JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Scent Guide Section -->
-        <section id="scent" class="mt-8 scroll-mt-20">
-            <h2 class="text-xl font-black mb-4 flex items-center gap-2">
-                <svg class="w-6 h-6 text-[#9b5de5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M5.5 9.5 8 12l-2.5 2.5"/><path d="M18.5 9.5 16 12l2.5 2.5"/></svg>
-                尋香行事曆與完整清單
-            </h2>
-            
-            <div class="flex flex-col gap-4">
-                <!-- P.Seven Card -->
-                <div class="bg-water rounded-3xl border-thick p-5 shadow-solid">
-                    <h3 class="font-black text-lg border-b-3 border-ink pb-2 mb-3">📍 Day 3: P.Seven (雨晴香水)</h3>
-                    <p class="text-sm font-bold mb-2">🇹🇼 台灣原創茶香 | 漢神百貨本館 5F (UUIN)</p>
-                    <p class="text-sm font-medium mb-4 bg-washi p-3 rounded-xl border-2 border-ink">💡 <strong>攻略：</strong>追求「乾淨清透」必試台灣茗香水；追求「深沉木味+高持久度」重點試石縫之花與獵。</p>
-                    
-                    <div class="overflow-x-auto hide-scroll -mx-2 px-2">
-                        <table class="min-w-[500px] bg-washi text-sm">
-                            <thead>
-                                <tr>
-                                    <th class="w-1/4">商品名稱</th>
-                                    <th class="w-1/2">特色與香調</th>
-                                    <th class="w-1/4">售價 (NTD)</th>
-                                </tr>
-                            </thead>
-                            <tbody class="font-medium">
-                                <tr>
-                                    <td class="font-bold">茗 香水</td>
-                                    <td>金萱(微奶香與梔子花)、墨香與檜木</td>
-                                    <td>2450(正)/1380(隨)/580(袖)</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-bold">金桂 香水</td>
-                                    <td>桂花與茶香交織的溫潤香氣</td>
-                                    <td>2450(正)/1380(隨)/580(袖)</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-bold">Oolong Tea 沁香</td>
-                                    <td>綠茶清純與茉莉花香的輕盈烏龍</td>
-                                    <td>3850</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-bold">Formosa Beau-Tea</td>
-                                    <td>東方美人茶靈感香氣</td>
-                                    <td>3850</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-bold">Aged Tea 暗香</td>
-                                    <td>綠茶/烏龍/草香 ➡️ 黑茶 ➡️ 檜木</td>
-                                    <td>4050</td>
-                                </tr>
-                                <tr>
-                                    <td class="font-bold">Vintage Black Tea</td>
-                                    <td>復古熟成紅茶風味 (璞香)</td>
-                                    <td>3580</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Other Scents -->
-                <div class="grid grid-cols-1 gap-4">
-                    <div class="bg-yamabuki rounded-2xl border-thick p-4 shadow-solid">
-                        <h4 class="font-black text-md border-b-2 border-ink pb-1 mb-2">📍 Day 1: LOE (韓國)</h4>
-                        <p class="text-sm"><strong>地點：</strong>DT STORE 苓雅門市</p>
-                        <p class="text-sm mt-1"><strong>重點：</strong>Harsh Green (綠葉/草本/檸檬)。極致綠意乾淨清新，需留意留香時間。</p>
-                    </div>
-                    
-                    <div class="bg-coral text-washi rounded-2xl border-thick p-4 shadow-solid">
-                        <h4 class="font-black text-md border-b-2 border-ink pb-1 mb-2">📍 Day 3: EYECANDLE (台灣)</h4>
-                        <p class="text-sm"><strong>地點：</strong>蔦屋書店 大立店</p>
-                        <p class="text-sm mt-1"><strong>重點：</strong>黑茶 Black Tea。強烈推薦買「滾珠香水油」，香味貼膚揮發慢，持久度佳。</p>
-                    </div>
-
-                    <div class="bg-wakatake rounded-2xl border-thick p-4 shadow-solid">
-                        <h4 class="font-black text-md border-b-2 border-ink pb-1 mb-2">📍 Day 5: 漢神巨蛋 3F</h4>
-                        <ul class="text-sm list-disc pl-4 space-y-2 mt-2">
-                            <li><strong>Youssoful (韓國):</strong> Saint Moritz。沖完涼嘅溫柔乾淨感。</li>
-                            <li><strong>Obvious (法國):</strong> Une Tige (綠茎)、Une Rose。</li>
-                            <li><strong>Goldfield & Banks:</strong> Pacific Rock Moss。頂級海洋苔蘚。</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Checklist Section -->
-        <section id="checklist" class="mt-8 mb-8 scroll-mt-20">
-            <h2 class="text-xl font-black mb-4 flex items-center gap-2">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                出發前準備清單
-            </h2>
-            <div class="bg-washi border-thick rounded-3xl p-5 shadow-solid">
-                <ul class="flex flex-col gap-3" id="checklist-items">
-                    <!-- Items injected by JS -->
-                </ul>
             </div>
         </section>
 
     </main>
 
+    <!-- 頁尾 (極簡留白與微字距) -->
+    <footer class="mt-28 pb-16 text-center text-xs text-cover font-light tracking-widest">
+        <p>KAOHSIUNG TRIP 2026 • DESIGNED WITH APPLE / GOOGLE MINIMALISM</p>
+    </footer>
+
+    <!-- 右下角智慧快速導航按鈕組 (Apple 毛玻璃極簡懸浮控制) -->
+    <div id="floating-scroll-nav" class="fixed bottom-6 right-5 md:bottom-8 md:right-8 z-40 flex flex-col gap-2.5 opacity-0 pointer-events-none transition-all duration-300 transform translate-y-3">
+        <!-- 回到當前區塊最頂端 -->
+        <button onclick="scrollToCurrentSectionTop()" class="w-11 h-11 md:w-12 md:h-12 rounded-full glass-panel bg-white/90 shadow-soft text-hematite hover:text-fusion hover:bg-white flex items-center justify-center text-lg active:scale-95 transition-all focus:outline-none" title="回到當前區塊頂端">
+            <i class="ph-bold ph-caret-up"></i>
+        </button>
+        <!-- 回到全頁最頂首頁 -->
+        <button onclick="scrollToPageTop()" class="w-11 h-11 md:w-12 md:h-12 rounded-full bg-fusion/90 text-white shadow-soft hover:bg-fusion flex items-center justify-center text-lg active:scale-95 transition-all focus:outline-none" title="返回頁首">
+            <i class="ph-bold ph-arrow-line-up"></i>
+        </button>
+    </div>
+
+    <!-- Interactive Scripts -->
     <script>
-        // Helper to generate Google Map Links easily in JS
-        const gmap = (name, query = name) => `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}" target="_blank" class="map-link">${name} 📍</a>`;
+        // 手機端 Pull-down Menu 開關邏輯
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileDropdown = document.getElementById('mobile-dropdown');
+        const menuIcon = document.getElementById('menu-icon');
 
-        // --- Data ---
-        const targetDate = new Date('2026-10-29T12:15:00').getTime();
+        if (mobileBtn && mobileDropdown) {
+            mobileBtn.addEventListener('click', () => {
+                const isHidden = mobileDropdown.classList.contains('hidden');
+                if (isHidden) {
+                    mobileDropdown.classList.remove('hidden');
+                    menuIcon.classList.remove('ph-list');
+                    menuIcon.classList.add('ph-x');
+                } else {
+                    mobileDropdown.classList.add('hidden');
+                    menuIcon.classList.remove('ph-x');
+                    menuIcon.classList.add('ph-list');
+                }
+            });
+        }
 
-        const itineraryData = [
-            {
-                day: 1, date: "10月29日 (四)", title: "抵港 ➡️ 碼頭海風 ➡️ 橘線一條龍 ➡️ 總館夜景", hours: "8 小時",
-                events: [
-                    { time: "13:45 - 16:30", title: "抵港與碼頭海風", desc: `從 ${gmap('高雄國際機場站')} 搭紅線至 ${gmap('三多商圈站')} (4號出口)，步行至 ${gmap('康橋商旅-三多商圈館')} 放行李，接著直行新光路至 ${gmap('新光碼頭(星光水岸公園)')}。`, type: "transport", tag: "捷運" },
-                    { time: "16:30 - 18:15", title: "橘線散步甜品 ＆ 尋香", desc: `轉橘線至 ${gmap('五塊厝站')}/${gmap('文化中心站')}。<br>• ${gmap('有碗碗盤')}：挖寶日系餐具<br>• ${gmap('菱果')}：買手工泡芙<br>• ${gmap('DT STORE 苓雅門市')}：尋香第1站 (試LOE)<br>• ${gmap('樹sugoeat')}：買招牌泡芙`, type: "scent", tag: "尋香第1站", mustGo: true },
-                    { time: "18:30 - 21:00", title: "晚餐與百萬夜景", desc: `步行至 ${gmap('老潮派台灣麵食館 高雄和平店', '老潮派台灣麵食館 和平店')} 吃晚餐。搭捷運回三多商圈，步行至 ${gmap('高雄市立圖書館總館')} 頂樓看夜景。`, type: "food", tag: "晚餐", mustGo: true },
-                    { time: "21:00+", title: "夜間採買 ＆ 宵夜", desc: `宵夜路線：${gmap('和三辣 麻辣燙 高雄苓雅店', '和三辣 高雄苓雅店')} ➡️ ${gmap('興中夜市')} ➡️ ${gmap('7-ELEVEN 高雄三門市')} ➡️ ${gmap('台酒苓雅營業所')}。`, type: "shopping" },
-                    { time: "🍽️ 智能美食", title: "Day 1 苓雅區美食地圖", desc: `1. ${gmap('苓雅油煎肉圓')}：外皮酥脆的宵夜首選($50)。<br>2. ${gmap('烏弄 WUNONG 學源店', '烏弄 學源店')}：宵夜解膩必備「名間鄉冬片仔」($40)。`, type: "food", isMap: true }
-                ]
-            },
-            {
-                day: 2, date: "10月30日 (五)", title: "OSAMU快閃 ➡️ 旗津慢活 ➡️ 隱藏海景 ➡️ 青花驕", hours: "11 小時",
-                events: [
-                    { time: "10:30 - 17:00", title: "展覽 ＆ 離島慢活", desc: `搭輕軌至 ${gmap('內惟藝術中心站')} 逛 ${gmap('內惟藝術中心')} (OSAMU 快閃)。隨後輕軌至 ${gmap('哈瑪星站')}，步行 ${gmap('鼓山輪渡站')} 搭船至 ${gmap('旗津輪渡站')}，租車漫遊 ${gmap('旗津彩虹教堂')}。`, type: "scenery", tag: "必去", mustGo: true },
-                    { time: "17:00 - 19:30", title: "隱藏海景 ＆ 輕軌漫遊", desc: `搭船返鼓山，散步至 ${gmap('碧港良居')} 旁海傍看日落(⚠️建議16:45前搭船)。搭輕軌至 ${gmap('軟體園區站')}，逛 ${gmap('台鋁 MLD')}。`, type: "scenery" },
-                    { time: "19:45+", title: "晚餐 ＆ 散步甜品", desc: `於 ${gmap('青花驕 高雄台鋁店')} 晚餐。搭紅線至前金區買 ${gmap('乳夫煮茶')} 與 ${gmap('莫妮日式精品')}。`, type: "food", tag: "晚餐", mustGo: true },
-                    { time: "🍽️ 智能美食", title: "Day 2 旗津/哈瑪星地圖", desc: `1. ${gmap('旗津不一樣赤肉羹')}：肉塊先炸過再煮羹($70)。<br>2. ${gmap('新濱・駅前')}：百年金庫改建絕美咖啡館($150)。`, type: "food", isMap: true }
-                ]
-            },
-            {
-                day: 3, date: "10月31日 (六)", title: "尋香連線 ➡️ 演唱會 ➡️ 瑞豐夜市", hours: "12.5 小時",
-                events: [
-                    { time: "11:00 - 16:15", title: "尋香第2、3站 ＆ 備戰", desc: `捷運 ${gmap('中央公園站')}。步行 ${gmap('TSUTAYA 蔦屋書店 高雄大立店', '蔦屋書店 大立店')} 試香。步行 ${gmap('らーめん壱 Ramen Ichi')} 午餐。轉往 ${gmap('漢神百貨本館')} 試香。回飯店充電。`, type: "scent", tag: "尋香" },
-                    { time: "16:15 - 22:30", title: "💜 藤井風演唱會", desc: `紅線 ${gmap('左營站')} 補給，轉 ${gmap('世運站')} 抵達 ${gmap('國家體育場(世運主場館)', '國家體育場')}。散場後搭紅線向南至 ${gmap('巨蛋站')}。`, type: "event", tag: "Live", mustGo: true },
-                    { time: "22:30+", title: "人氣宵夜掃街", desc: `於 ${gmap('瑞豐夜市')} 大掃街。`, type: "food", mustGo: true },
-                    { time: "🍽️ 智能美食", title: "Day 3 左營/巨蛋地圖", desc: `1. ${gmap('菜市仔嬤左營汾陽餛飩 高鐵店', '菜市仔嬤左營汾陽餛飩')}：進場前墊胃清爽選擇($90)。<br>2. ${gmap('曾氏福建炒麵 瑞豐夜市', '曾氏福建炒麵')}：大火爆炒充滿鑊氣($100)。`, type: "food", isMap: true }
-                ]
-            },
-            {
-                day: 4, date: "11月1日 (日)", title: "三民市場 ➡️ 駁二週末 ➡️ 夢時代 ➡️ 家樂福", hours: "11 小時",
-                events: [
-                    { time: "11:00 - 17:30", title: "傳統美食 ＆ 鹽埕駁二", desc: `前往 ${gmap('三民第一公有市場')} 午餐。逛 ${gmap('溢起瘋扭蛋')}、買 ${gmap('巴堂蜂蜜蛋糕')}。步行至 ${gmap('駁二藝術特區 C5倉庫', '駁二 C5')} 與市集，買 ${gmap('駁二車輪餅')}。`, type: "scenery", tag: "市集" },
-                    { time: "17:30 - 21:00", title: "商場採買", desc: `搭輕軌至 ${gmap('夢時代站')} 逛 ${gmap('統一夢時代購物中心')}。步行至 ${gmap('家樂福 成功店')} 採買後放回飯店。`, type: "shopping", tag: "購物" },
-                    { time: "21:00+", title: "自強夜市", desc: `步行至 ${gmap('自強夜市(苓雅夜市)', '自強夜市')} 晚餐與宵夜。`, type: "food", mustGo: true },
-                    { time: "🍽️ 智能美食", title: "Day 4 鹽埕/自強地圖", desc: `1. ${gmap('鹽埕吳家金桔豆花')}：逛完駁二的完美解渴甜品($45)。<br>2. ${gmap('名都飲食店')}：自強夜市內超強陽春麵與現切滷味($80)。`, type: "food", isMap: true }
-                ]
-            },
-            {
-                day: 5, date: "11月2日 (一)", title: "動漫尋寶 ➡️ 巨蛋尋香 ➡️ 衛武營 ➡️ 六合夜市", hours: "11 小時",
-                events: [
-                    { time: "10:30 - 14:45", title: "二次元 ＆ 巨蛋前哨", desc: `逛 ${gmap('高雄車站')} 動漫街 ➡️ ${gmap('後驛站')} 買 ${gmap('如邑堂 博愛店', '如邑堂')}。至 ${gmap('凹子底站')} ${gmap('赤燒分子廚藝')} 午餐，買 ${gmap('侍茶匠 左營富國店', '侍茶匠')}。`, type: "shopping" },
-                    { time: "14:45 - 19:45", title: "尋香第4站 ＆ 衛武營", desc: `步行 ${gmap('漢神巨蛋購物廣場')} 尋香與甜點。轉乘至 ${gmap('衛武營站')}，散步 ${gmap('衛武營國家藝術文化中心', '衛武營')}，買 ${gmap('木侖花生糖')}。於 ${gmap('貴方牛鳴')} 晚餐。`, type: "scent", tag: "尋香第4站" },
-                    { time: "20:00+", title: "甜品 ＆ 宵夜", desc: `捷運 ${gmap('美麗島站')}，買 ${gmap('不二緻果 美麗島店', '不二緻果')} 芋頭蛋糕，直上 ${gmap('六合夜市')} 買 ${gmap('魷布院')}。`, type: "food" },
-                    { time: "🍽️ 智能美食", title: "Day 5 巨蛋/衛武營 (週一備案)", desc: `1. ${gmap('鼎泰豐 漢神巨蛋店', '鼎泰豐')}：若赤燒休店，排骨炒飯永不踩雷($350)。<br>2. ${gmap('鳳山老爺美食館')}：若貴方休店，焦糖燻鴨拯救你的胃($150)。`, type: "food", isMap: true }
-                ]
-            },
-            {
-                day: 6, date: "11月3日 (二)", title: "三多 Brunch ➡️ 最後補貨 ➡️ 登機", hours: "4.5 小時",
-                events: [
-                    { time: "09:30 - 13:45", title: "退房與市區漫遊", desc: `飯店退房寄存行李，於 ${gmap('三多商圈')} 享用 Brunch 並補齊伴手禮。`, type: "shopping" },
-                    { time: "13:45 - 16:40", title: "賦歸", desc: `搭捷運 ${gmap('三多商圈站')} 直達 ${gmap('高雄國際機場站')} 辦理離境。`, type: "flight", tag: "賦歸" },
-                    { time: "🍽️ 智能美食", title: "Day 6 三多商圈地圖", desc: `1. ${gmap('步道咖啡 Cafe Strada', '步道咖啡')}：復古文青，單品咖啡與早午餐水準極高($300)。<br>2. ${gmap('老江紅茶牛奶 三多店', '老江紅茶牛奶')}：半熟蛋火腿吐司配濃紅茶($100)。`, type: "food", isMap: true }
-                ]
+        function closeMobileMenu() {
+            if (mobileDropdown) {
+                mobileDropdown.classList.add('hidden');
             }
-        ];
+            if (menuIcon) {
+                menuIcon.classList.remove('ph-x');
+                menuIcon.classList.add('ph-list');
+            }
+        }
 
-        const checkListItems = [
+        // 精確導航滾動函式：扣除頂端 Sticky Header 高度，避免跳回頁首或被遮擋
+        function navigateSection(event, targetId) {
+            if (event) {
+                event.preventDefault();
+            }
+            closeMobileMenu();
+
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                const header = document.querySelector('header');
+                const headerHeight = header ? header.offsetHeight : 72;
+                const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - headerHeight - 16;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Tab 切換邏輯 (高雅順滑)
+        function switchDay(day) {
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.classList.remove('bg-fusion', 'text-white', 'shadow-soft');
+                btn.classList.add('bg-white/70', 'text-hematite', 'hover:bg-white');
+            });
+            const activeBtn = document.getElementById(`btn-day-${day}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white/70', 'text-hematite', 'hover:bg-white');
+                activeBtn.classList.add('bg-fusion', 'text-white', 'shadow-soft');
+                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('block');
+                content.classList.add('hidden');
+            });
+            const targetContent = document.getElementById(`content-day-${day}`);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+                targetContent.classList.add('block');
+            }
+        }
+
+        // 指定的 9 項出發 Checklist（加入 chiikawa公仔）
+        const checkItems = [
             "護照及入台證",
             "港幣與台幣現金",
-            "信用卡/提款卡",
+            "洗面巾/防曬/粉底",
             "藤井風演唱會門票 (電子/實體)",
             "悠遊卡/一卡通",
             "轉插器及充電線",
-            "行動電源",
             "個人藥物及腸胃藥",
-            "環保袋 (購物備用)"
+            "環保袋 (購物備用)",
+            "chiikawa公仔"
         ];
 
-        // --- Logic ---
-        let currentDay = 1;
+        const checklistContainer = document.getElementById('checklist');
+        if (checklistContainer) {
+            checklistContainer.innerHTML = '';
+            checkItems.forEach((item) => {
+                const label = document.createElement('label');
+                label.className = "flex items-center gap-3.5 cursor-pointer custom-checkbox bg-white/60 p-3.5 md:p-4 rounded-2xl transition-all hover:bg-white/80";
+                label.innerHTML = `
+                    <input type="checkbox" class="hidden">
+                    <div class="checkbox-circle w-5 h-5 rounded-full bg-white/80 flex items-center justify-center transition-all flex-shrink-0 shadow-sm">
+                        <svg class="w-3 h-3 text-white opacity-0 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <span class="text-sm md:text-base text-hematite font-medium transition-all check-text select-none leading-relaxed">${item}</span>
+                `;
+                checklistContainer.appendChild(label);
+            });
+        }
 
-        const typeColors = {
-            flight: 'bg-water', transport: 'bg-washi border-ink', hotel: 'bg-coral text-washi',
-            scent: 'bg-yamabuki', food: 'bg-wakatake', scenery: 'bg-water', shopping: 'bg-coral', event: 'bg-[#9b5de5] text-washi'
+        // 出發倒數計時器 (Target: 29 Oct 2026 12:15)
+        function updateCountdown() {
+            const departureDate = new Date('2026-10-29T12:15:00+08:00').getTime();
+            const now = new Date().getTime();
+            const difference = departureDate - now;
+
+            if (difference > 0) {
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((difference % (1000 * 60)) / 1000);
+
+                const dEl = document.getElementById('days');
+                const hEl = document.getElementById('hours');
+                const mEl = document.getElementById('mins');
+                const sEl = document.getElementById('secs');
+
+                if (dEl) dEl.innerText = days;
+                if (hEl) hEl.innerText = hours;
+                if (mEl) mEl.innerText = mins;
+                if (sEl) sEl.innerText = secs;
+            }
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 頁面滾動淡入觀察者 (IntersectionObserver)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.08
         };
 
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
-            const daysElement = document.getElementById('countdown-days');
-            
-            if (distance < 0) {
-                daysElement.innerText = "出發啦!";
-                daysElement.classList.remove('text-2xl');
-                daysElement.classList.add('text-lg');
-            } else {
-                const days = Math.ceil(distance / (1000 * 60 * 60 * 24));
-                daysElement.innerText = days;
-            }
-        }
-
-        function renderTabs() {
-            const container = document.getElementById('tabs-container');
-            container.innerHTML = '';
-            itineraryData.forEach(data => {
-                const isActive = data.day === currentDay;
-                const btn = document.createElement('button');
-                btn.className = `clickable px-4 py-2 rounded-2xl border-thick font-black whitespace-nowrap transition-colors flex-shrink-0 ${isActive ? 'bg-ink text-washi shadow-solid-sm translate-x-[2px] translate-y-[2px]' : 'bg-washi text-ink shadow-solid'}`;
-                btn.innerText = `Day ${data.day}`;
-                btn.onclick = () => switchDay(data.day);
-                container.appendChild(btn);
-            });
-        }
-
-        function renderTimeline() {
-            const container = document.getElementById('timeline-container');
-            const titleEl = document.getElementById('daily-title');
-            const dateEl = document.getElementById('daily-date');
-            const hoursEl = document.getElementById('daily-hours');
-            
-            const dayData = itineraryData.find(d => d.day === currentDay);
-            
-            titleEl.innerText = `Day ${dayData.day}: ${dayData.title.split('➡️')[0]}...`;
-            dateEl.innerText = dayData.date;
-            hoursEl.innerText = `停留: ${dayData.hours}`;
-            
-            container.innerHTML = '';
-            container.classList.remove('anim-bounce-in');
-            void container.offsetWidth; 
-            container.classList.add('anim-bounce-in');
-
-            dayData.events.forEach((event, index) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'timeline-item relative pl-12 pb-6 timeline-line group';
-                
-                const dotColor = typeColors[event.type] || 'bg-ink';
-                const isMapItem = event.isMap;
-                const iconSvg = isMapItem ? '🍽️' : getIconSvg(event.type);
-                
-                const dotHtml = `
-                    <div class="absolute left-0 top-1 w-10 h-10 rounded-full border-thick flex items-center justify-center z-10 ${isMapItem ? 'bg-washi border-dashed' : dotColor} shadow-solid-sm text-lg">
-                        ${iconSvg}
-                    </div>
-                `;
-
-                let tagHtml = '';
-                if (event.tag) {
-                    tagHtml += `<span class="inline-block px-2 py-0.5 rounded-md border-2 border-ink text-xs font-bold bg-washi text-ink mb-1 mr-1">${event.tag}</span>`;
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    obs.unobserve(entry.target);
                 }
-                if (event.mustGo) {
-                    tagHtml += `<span class="inline-block px-2 py-0.5 rounded-md border-2 border-ink text-xs font-bold bg-coral text-washi mb-1 animate-pulse">✨必去</span>`;
-                }
-
-                const contentHtml = `
-                    <div class="${isMapItem ? 'bg-yamabuki bg-opacity-20' : 'bg-washi'} border-thick rounded-xl p-3 shadow-solid-sm transition-all">
-                        <div class="text-xs font-bold text-gray-600 flex items-center gap-1 mb-1">
-                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            ${event.time}
-                        </div>
-                        <h4 class="font-black text-[15px] leading-tight mb-1 ${isMapItem ? 'text-coral' : ''}">${event.title}</h4>
-                        ${tagHtml}
-                        ${event.desc ? `<p class="text-sm font-medium leading-relaxed mt-1">${event.desc}</p>` : ''}
-                    </div>
-                `;
-
-                itemDiv.innerHTML = dotHtml + contentHtml;
-                container.appendChild(itemDiv);
             });
-        }
+        }, observerOptions);
 
-        function getIconSvg(type) {
-            switch(type) {
-                case 'flight': return `<svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.2-1.1.6L3 8l6 5-3 3-3.2-.8c-.4-.1-.8.2-1 .6L1 17l4 1 1 4 .8-1c.4-.2.7-.6.6-1l-.8-3.2 3-3 5 6 1.2-.7c.4-.2.7-.6.6-1.1z"/></svg>`;
-                case 'transport': return `<svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="12" width="18" height="8" rx="2"/><path d="M5.5 12V7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v5"/><circle cx="8" cy="16" r="1"/><circle cx="16" cy="16" r="1"/></svg>`;
-                case 'hotel': return `<svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M10 22v-6.57"/><path d="M12 11h.01"/><path d="M12 7h.01"/><path d="M14 15.43V22"/><path d="M15 16a5 5 0 0 0-6 0"/><path d="M16 11h.01"/><path d="M16 7h.01"/><path d="M8 11h.01"/><path d="M8 7h.01"/><rect x="4" y="2" width="16" height="20" rx="2"/></svg>`;
-                case 'food': return `<svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m11.5 18.2-8-3.2a1.8 1.8 0 0 1-1-2.2L5 4h14l2.5 8.8a1.8 1.8 0 0 1-1 2.2l-8 3.2Z"/><path d="M11.5 18.2V22"/><path d="M8.5 22h6"/></svg>`;
-                case 'scent': return `<svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 2v20"/><path d="M5.5 9.5 8 12l-2.5 2.5"/><path d="M18.5 9.5 16 12l2.5 2.5"/></svg>`;
-                case 'scenery': return `<svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>`;
-                case 'shopping': return `<svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
-                case 'event': return `<svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
-                default: return `<svg class="w-5 h-5 text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10"/></svg>`;
-            }
-        }
-
-        function switchDay(day) {
-            currentDay = day;
-            renderTabs();
-            renderTimeline();
-        }
-
-        function renderChecklist() {
-            const container = document.getElementById('checklist-items');
-            checkListItems.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = "flex items-center gap-3 bg-washi p-3 rounded-xl border-thick shadow-solid-sm cursor-pointer";
-                li.onclick = function() {
-                    const check = this.querySelector('.check-mark');
-                    const text = this.querySelector('.text-content');
-                    check.classList.toggle('opacity-0');
-                    text.classList.toggle('line-through');
-                    text.classList.toggle('text-gray-400');
-                    this.style.transform = 'translate(2px, 2px)';
-                    this.style.boxShadow = 'none';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                        this.style.boxShadow = '';
-                    }, 100);
-                };
-                
-                li.innerHTML = `
-                    <div class="w-6 h-6 border-2 border-ink rounded-md flex items-center justify-center bg-white flex-shrink-0">
-                        <svg class="w-4 h-4 check-mark opacity-0 transition-opacity text-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                    <span class="font-bold text-content transition-all">${item}</span>
-                `;
-                container.appendChild(li);
-            });
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCountdown();
-            setInterval(updateCountdown, 86400000); // Update daily
-            renderTabs();
-            renderTimeline();
-            renderChecklist();
+        document.querySelectorAll('.fade-up').forEach(el => {
+            observer.observe(el);
         });
+
+        // 導覽列滾動陰影微調 (帶空值防護)
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (header) {
+                if (window.scrollY > 20) {
+                    header.classList.add('shadow-soft');
+                    header.style.background = 'rgba(243, 244, 241, 0.94)';
+                } else {
+                    header.classList.remove('shadow-soft');
+                    header.style.background = 'rgba(243, 244, 241, 0.88)';
+                }
+            }
+
+            // 右下角懸浮按鈕顯示/隱藏控制
+            const floatNav = document.getElementById('floating-scroll-nav');
+            if (floatNav) {
+                if (window.scrollY > 250) {
+                    floatNav.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-3');
+                    floatNav.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+                } else {
+                    floatNav.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+                    floatNav.classList.add('opacity-0', 'pointer-events-none', 'translate-y-3');
+                }
+            }
+        });
+
+        // 懸浮按鈕：平滑回到全頁最頂
+        function scrollToPageTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 懸浮按鈕：智慧感應並平滑滾動回當前正在閱讀的板塊最頂端
+        function scrollToCurrentSectionTop() {
+            const sectionIds = ['overview', 'itinerary', 'fragrance', 'wheel-section', 'checklist-section'];
+            const header = document.querySelector('header');
+            const headerHeight = header ? header.offsetHeight : 72;
+            const scrollPos = window.scrollY + headerHeight + 60;
+
+            let currentSection = null;
+            for (let i = 0; i < sectionIds.length; i++) {
+                const el = document.getElementById(sectionIds[i]);
+                if (el) {
+                    const top = el.offsetTop;
+                    const bottom = top + el.offsetHeight;
+                    if (scrollPos >= top && scrollPos <= bottom) {
+                        currentSection = el;
+                        break;
+                    }
+                }
+            }
+
+            if (currentSection) {
+                navigateSection(null, currentSection.id);
+            } else {
+                scrollToPageTop();
+            }
+        }
+
+        // ================= 美食決策幸運輪盤 (Lucky Wheel Logic) =================
+        const wheelDatasets = [
+            {
+                name: "飲品 / 奶茶",
+                items: [
+                    "烏弄原生茶飲", "八曜和茶", "得正", "希望奶茶", "50嵐",
+                    "再睡五分鐘", "五桐號", "麻古茶坊", "侍茶匠", "御典茶",
+                    "磚茶室", "乳夫煮茶", "樺達奶茶"
+                ]
+            },
+            {
+                name: "正餐 / 主食",
+                items: [
+                    "牛肉麵", "牛肉湯\n+飯", "拉麵", "沾麵", "打邊爐",
+                    "滷肉飯\n控肉飯", "古早味", "臭臭鍋", "小籠包\n水餃", "丹丹漢堡\n/ M記"
+                ]
+            },
+            {
+                name: "早餐 / 宵夜",
+                items: [
+                    "大港飯團", "瞓耐啲啦", "老江紅茶牛奶"
+                ]
+            },
+            {
+                name: "夜市清單",
+                items: [
+                    "興中夜市", "忠孝夜市", "瑞豐夜市", "光華夜市", "六合夜市\n(魷布院)"
+                ]
+            }
+        ];
+
+        // 2026 Pantone 柔和輔助色循環調配
+        const wheelPalette = [
+            '#CDE5CE', // Veiled Vista
+            '#6EB6E4', // Baltic Sea
+            '#E4D488', // Golden Mist
+            '#A88EAE', // Quiet Violet
+            '#F3F4F1'  // Cloud Dancer
+        ];
+
+        let currentCatIndex = 0;
+        let wheelCanvas = document.getElementById('wheel-canvas');
+        let currentRotation = 0; // 當前累積旋轉弧度 (rad)
+        let isSpinning = false;
+        let selectedItemText = "";
+
+        // 高清晰度 (Retina HD) 繪製輪盤，徹底解決字體模糊問題
+        function drawWheel() {
+            if (!wheelCanvas) return;
+            const ctx = wheelCanvas.getContext('2d');
+            const items = wheelDatasets[currentCatIndex].items;
+            const numItems = items.length;
+            const arc = (2 * Math.PI) / numItems;
+
+            // 取得 CSS 邏輯顯示尺寸
+            const displayWidth = wheelCanvas.clientWidth || 360;
+            const displayHeight = wheelCanvas.clientHeight || 360;
+
+            // 支援 Retina 高畫質倍率 (防止字體與邊線模糊)
+            const dpr = Math.max(window.devicePixelRatio || 1, 2);
+            if (wheelCanvas.width !== displayWidth * dpr || wheelCanvas.height !== displayHeight * dpr) {
+                wheelCanvas.width = displayWidth * dpr;
+                wheelCanvas.height = displayHeight * dpr;
+            }
+
+            ctx.save();
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+            const centerX = displayWidth / 2;
+            const centerY = displayHeight / 2;
+            const radius = displayWidth / 2 - 4;
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(currentRotation);
+
+            for (let i = 0; i < numItems; i++) {
+                const angle = i * arc;
+
+                // 填充扇形
+                ctx.beginPath();
+                ctx.fillStyle = wheelPalette[i % wheelPalette.length];
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, angle, angle + arc);
+                ctx.closePath();
+                ctx.fill();
+
+                // 扇形微分隔線 (柔和深灰線)
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(115, 107, 103, 0.2)';
+                ctx.lineWidth = 1.5;
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, angle, angle + arc);
+                ctx.stroke();
+
+                // 繪製文字：智慧方向糾正 + 向心輻射排版（徹底解決字體倒轉與貼邊問題）
+                ctx.save();
+                
+                // 計算扇形中心角 (以世界坐標角度計算)
+                const midAngle = angle + arc / 2;
+                ctx.rotate(midAngle);
+
+                // 文字繪製半徑：置於扇區中段 (中心按鈕外緣與輪盤外圈之間的黃金位置)
+                // 徹底避免文字頂到最外緣被切斷
+                const textTargetRadius = radius * 0.62;
+
+                // 核心關鍵修正：當扇區轉向左半側時，文字若順著半徑會「上下倒轉」
+                // 計算 midAngle 在 [0, 2π) 中的實際方位
+                let normalizedAngle = (midAngle + currentRotation) % (2 * Math.PI);
+                if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
+
+                const isLeftHalf = (normalizedAngle > Math.PI / 2 && normalizedAngle < (3 * Math.PI) / 2);
+
+                ctx.translate(textTargetRadius, 0);
+                if (isLeftHalf) {
+                    // 自動轉正 180 度，讓文字永遠正面朝上，不再需要歪頭看
+                    ctx.rotate(Math.PI);
+                }
+
+                ctx.fillStyle = '#2D2825'; // 加深色調，對比更清晰
+
+                // 自適應字體大小加大：清晰可讀
+                let fontSize = 14;
+                if (numItems > 10) {
+                    fontSize = 11.5;
+                } else if (numItems <= 5) {
+                    fontSize = 15;
+                }
+                ctx.font = `700 ${fontSize}px 'Jost', 'Noto Sans HK', sans-serif`;
+
+                // 柔和白色文字描邊光暈，確保在任何背景色塊上均極度清晰銳利
+                ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
+                ctx.shadowBlur = 5;
+
+                // 智慧分行處理：支援手動換行符號 (\n) 或長字精準排版
+                let rawText = items[i];
+                let lines = [];
+                if (rawText.includes('\n')) {
+                    lines = rawText.split('\n');
+                } else if (rawText.includes('(')) {
+                    const idx = rawText.indexOf('(');
+                    lines = [rawText.slice(0, idx), rawText.slice(idx)];
+                } else if (rawText.includes('（')) {
+                    const idx = rawText.indexOf('（');
+                    lines = [rawText.slice(0, idx), rawText.slice(idx)];
+                } else if (rawText.length >= 6 && numItems >= 8) {
+                    lines = [rawText.slice(0, Math.ceil(rawText.length / 2)), rawText.slice(Math.ceil(rawText.length / 2))];
+                } else {
+                    lines = [rawText];
+                }
+
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                const lineHeight = fontSize * 1.25;
+                lines.forEach((line, lineIdx) => {
+                    const yOffset = (lineIdx - (lines.length - 1) / 2) * lineHeight;
+                    ctx.fillText(line.trim(), 0, yOffset);
+                });
+
+                ctx.restore();
+            }
+
+            // 外圓輪廓柔和修飾
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            ctx.restore();
+            ctx.restore();
+        }
+
+        // 監聽螢幕旋轉或大小改變時重新以高清重繪
+        window.addEventListener('resize', () => {
+            drawWheel();
+        });
+
+        // 切換輪盤分類
+        function changeWheelCategory(index) {
+            if (isSpinning) return;
+            currentCatIndex = index;
+            document.querySelectorAll('.wheel-cat-btn').forEach((btn, idx) => {
+                if (idx === index) {
+                    btn.classList.remove('text-hematite', 'hover:text-fusion');
+                    btn.classList.add('bg-fusion', 'text-white', 'shadow-soft');
+                } else {
+                    btn.classList.remove('bg-fusion', 'text-white', 'shadow-soft');
+                    btn.classList.add('text-hematite', 'hover:text-fusion');
+                }
+            });
+            currentRotation = 0;
+            drawWheel();
+        }
+
+        // 啟動旋轉
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            const items = wheelDatasets[currentCatIndex].items;
+            const numItems = items.length;
+            const arc = (2 * Math.PI) / numItems;
+
+            // 檢查是否偏好減少動態效果 (prefers-reduced-motion)
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            // 隨機選定中獎索引
+            const winningIndex = Math.floor(Math.random() * numItems);
+            selectedItemText = items[winningIndex];
+
+            // 計算停止角度：頂端指針位於 12點鐘 (-π/2 或 3π/2)
+            // 當前扇區中線需對齊 -π/2: angle + rotation = -π/2 + 2kπ
+            // 目標 rotation = -π/2 - (winningIndex + 0.5) * arc
+            const targetSectorAngle = -Math.PI / 2 - (winningIndex + 0.5) * arc;
+
+            if (prefersReducedMotion) {
+                // 無障礙：直接設定位置並於 300ms 顯示結果
+                currentRotation = targetSectorAngle;
+                drawWheel();
+                setTimeout(() => {
+                    isSpinning = false;
+                    showWheelModal(selectedItemText);
+                }, 300);
+                return;
+            }
+
+            // 正常物理慣性旋轉動畫 (至少旋轉 5 至 7 圈)
+            const fullRounds = 5 + Math.floor(Math.random() * 3);
+            const startRotation = currentRotation % (2 * Math.PI);
+            let finalRotation = startRotation + (fullRounds * 2 * Math.PI) + (targetSectorAngle - startRotation);
+            while (finalRotation < startRotation + fullRounds * 2 * Math.PI) {
+                finalRotation += 2 * Math.PI;
+            }
+
+            const duration = 4200; // 4.2秒
+            const startTime = performance.now();
+
+            // Cubic-bezier ease-out (1 - (1-t)^3)
+            function easeOutCubic(t) {
+                return 1 - Math.pow(1 - t, 3);
+            }
+
+            function animate(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easedProgress = easeOutCubic(progress);
+
+                currentRotation = startRotation + (finalRotation - startRotation) * easedProgress;
+                drawWheel();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    isSpinning = false;
+                    setTimeout(() => {
+                        showWheelModal(selectedItemText);
+                    }, 400);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // 顯示結果彈窗 (淡入)
+        function showWheelModal(item) {
+            const modal = document.getElementById('wheel-modal');
+            const card = document.getElementById('wheel-modal-card');
+            const text = document.getElementById('wheel-result-text');
+
+            if (modal && card && text) {
+                text.innerText = item;
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.classList.add('opacity-100', 'pointer-events-auto');
+                card.classList.remove('scale-95');
+                card.classList.add('scale-100');
+            }
+        }
+
+        // 關閉結果彈窗
+        function closeWheelModal() {
+            const modal = document.getElementById('wheel-modal');
+            const card = document.getElementById('wheel-modal-card');
+            if (modal && card) {
+                modal.classList.remove('opacity-100', 'pointer-events-auto');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                card.classList.remove('scale-100');
+                card.classList.add('scale-95');
+            }
+        }
+
+        // 再轉一次
+        function retryWheel() {
+            closeWheelModal();
+            setTimeout(() => {
+                spinWheel();
+            }, 300);
+        }
+
+        // 頁面初始化完成時繪製輪盤
+        window.addEventListener('DOMContentLoaded', () => {
+            drawWheel();
+        });
+        // 應對即時加載情況
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            drawWheel();
+        }
+
+        // ================= Hero 圖片自訂切換與載入處理 =================
+        function handleImageSuccess(img) {
+            img.classList.remove('hidden');
+            const skyBg = document.getElementById('hero-sky-bg');
+            if (skyBg) skyBg.classList.add('hidden');
+        }
+
+        function handleImageFallback(img) {
+            img.classList.add('hidden');
+            const skyBg = document.getElementById('hero-sky-bg');
+            if (skyBg) skyBg.classList.remove('hidden');
+        }
+
+        // ================= 相片上傳與互動裁剪 (Interactive Crop Logic) =================
+        let cropState = {
+            scale: 1,
+            baseScale: 1,
+            translateX: 0,
+            translateY: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            imageObj: null,
+            targetRatio: 16 / 9
+        };
+
+        const cropModal = document.getElementById('crop-modal');
+        const cropCard = document.getElementById('crop-modal-card');
+        const cropContainer = document.getElementById('crop-container');
+        const cropPreviewImg = document.getElementById('crop-preview-img');
+        const cropZoom = document.getElementById('crop-zoom');
+
+        function initCropModal(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    cropState.imageObj = img;
+                    cropPreviewImg.src = e.target.result;
+
+                    // 重設狀態與縮放
+                    cropState.scale = 1;
+                    cropState.translateX = 0;
+                    cropState.translateY = 0;
+                    if (cropZoom) cropZoom.value = 1;
+
+                    // 計算最適初始倍率
+                    const containerWidth = cropContainer.clientWidth || 400;
+                    const containerHeight = cropContainer.clientHeight || 260;
+                    const scaleX = containerWidth / img.naturalWidth;
+                    const scaleY = containerHeight / img.naturalHeight;
+                    cropState.baseScale = Math.max(scaleX, scaleY);
+
+                    updateCropTransform();
+
+                    // 開啟彈窗
+                    if (cropModal && cropCard) {
+                        cropModal.classList.remove('opacity-0', 'pointer-events-none');
+                        cropModal.classList.add('opacity-100', 'pointer-events-auto');
+                        cropCard.classList.remove('scale-95');
+                        cropCard.classList.add('scale-100');
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = ''; // 清空以支援重複選取
+        }
+
+        function closeCropModal() {
+            if (cropModal && cropCard) {
+                cropModal.classList.remove('opacity-100', 'pointer-events-auto');
+                cropModal.classList.add('opacity-0', 'pointer-events-none');
+                cropCard.classList.remove('scale-100');
+                cropCard.classList.add('scale-95');
+            }
+        }
+
+        function setAspectRatio(ratio, btn) {
+            cropState.targetRatio = ratio;
+            document.querySelectorAll('.crop-ratio-btn').forEach(b => {
+                b.classList.remove('bg-fusion', 'text-white', 'shadow-sm');
+                b.classList.add('bg-cloud', 'text-hematite');
+            });
+            if (btn) {
+                btn.classList.remove('bg-cloud', 'text-hematite');
+                btn.classList.add('bg-fusion', 'text-white', 'shadow-sm');
+            }
+            // 動態調整預覽視窗比例
+            if (cropContainer) {
+                const currentWidth = cropContainer.clientWidth;
+                const newHeight = Math.min(Math.round(currentWidth / ratio), 320);
+                cropContainer.style.height = `${newHeight}px`;
+                updateCropTransform();
+            }
+        }
+
+        function updateCropTransform() {
+            if (!cropPreviewImg || !cropState.imageObj) return;
+            const zoomVal = cropZoom ? parseFloat(cropZoom.value) : 1;
+            cropState.scale = cropState.baseScale * zoomVal;
+            cropPreviewImg.style.width = `${cropState.imageObj.naturalWidth * cropState.scale}px`;
+            cropPreviewImg.style.height = `${cropState.imageObj.naturalHeight * cropState.scale}px`;
+            cropPreviewImg.style.transform = `translate(${cropState.translateX}px, ${cropState.translateY}px)`;
+        }
+
+        // 監聽拖曳平移 (滑鼠與觸控)
+        if (cropContainer) {
+            const startDrag = (x, y) => {
+                cropState.isDragging = true;
+                cropState.startX = x - cropState.translateX;
+                cropState.startY = y - cropState.translateY;
+            };
+            const moveDrag = (x, y) => {
+                if (!cropState.isDragging) return;
+                cropState.translateX = x - cropState.startX;
+                cropState.translateY = y - cropState.startY;
+                updateCropTransform();
+            };
+            const endDrag = () => {
+                cropState.isDragging = false;
+            };
+
+            cropContainer.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+            window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+            window.addEventListener('mouseup', endDrag);
+
+            cropContainer.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    startDrag(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+            window.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1 && cropState.isDragging) {
+                    moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+            window.addEventListener('touchend', endDrag);
+        }
+
+        // 裁剪並套用到首頁背景
+        function applyCrop() {
+            if (!cropState.imageObj || !cropContainer) return;
+
+            const canvas = document.createElement('canvas');
+            const targetWidth = 1920;
+            const targetHeight = Math.round(1920 / cropState.targetRatio);
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext('2d');
+
+            const containerW = cropContainer.clientWidth;
+            const containerH = cropContainer.clientHeight;
+
+            // 計算映射回原圖之裁切位置
+            const ratioFactor = targetWidth / containerW;
+            const currentImgW = cropState.imageObj.naturalWidth * cropState.scale;
+            const currentImgH = cropState.imageObj.naturalHeight * cropState.scale;
+
+            // 圖片左上角相對 container 中心的偏移
+            const imgLeftInContainer = (containerW - currentImgW) / 2 + cropState.translateX;
+            const imgTopInContainer = (containerH - currentImgH) / 2 + cropState.translateY;
+
+            ctx.drawImage(
+                cropState.imageObj,
+                imgLeftInContainer * ratioFactor,
+                imgTopInContainer * ratioFactor,
+                currentImgW * ratioFactor,
+                currentImgH * ratioFactor
+            );
+
+            const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+            const customImg = document.getElementById('custom-hero-img');
+            const skyBg = document.getElementById('hero-sky-bg');
+
+            if (customImg) {
+                customImg.src = croppedDataUrl;
+                customImg.classList.remove('hidden');
+            }
+            if (skyBg) {
+                skyBg.classList.add('hidden');
+            }
+
+            closeCropModal();
+        }
     </script>
 </body>
 </html>
